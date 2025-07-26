@@ -1772,7 +1772,6 @@
 			document.getElementById('learning-screen').style.display = 'block';
 			document.getElementById('completion-screen').style.display = 'none';
 			
-			// 고정 버튼 숨기기 (사용 안 함)
 			const backBtn = document.getElementById('back-btn');
 			if (backBtn) {
 				backBtn.style.display = 'none';
@@ -1781,20 +1780,14 @@
 			const icon = currentCategory.split(' ')[0];
 			const title = currentCategory.split(' ').slice(1).join(' ');
 			
-			// nav-bar에 버튼과 제목 함께 표시 (중앙 정렬)
 			const navBar = document.getElementById('nav-bar');
 			navBar.innerHTML = `
-				<button class="back-btn" onclick="showMainScreen()" style="position: absolute; left: 0.5rem;">← 처음으로</button>
-				<h2 class="current-category" style="width: 100%; text-align: center; margin: 0;">
+				<button class="back-btn" onclick="showMainScreen()" style="min-width: 50px; padding: 0.75rem;">←</button>
+				<h2 class="current-category" style="flex: 1; text-align: center;">
 					<span class="emoji">${icon}</span> ${title}
 				</h2>
 			`;
 			
-			// nav-bar 스타일 조정
-			navBar.style.position = 'relative';
-			navBar.style.justifyContent = 'center';
-			
-			// 화면 전환 후 이모지 수정 재적용
 			setTimeout(fixIOSEmoji, 100);
 		}
 
