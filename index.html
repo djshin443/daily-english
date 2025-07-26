@@ -532,37 +532,55 @@
         }
 
         .back-btn {
-            background: linear-gradient(135deg, #ff6b6b, #ff8787);
-            color: white;
-            border: none;
-            border-radius: 1.25rem;
-            padding: 0.75rem 1.5rem;
-            font-size: clamp(0.9rem, 2.5vw, 1rem);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
-            font-family: 'Noto Sans KR', sans-serif;
-            touch-action: manipulation;
-            position: relative;
-            z-index: 10;
-            -webkit-tap-highlight-color: rgba(255, 107, 107, 0.3);
-            -webkit-appearance: none;
-            appearance: none;
-            /* 모바일 터치 최적화 */
-            -webkit-user-select: none;
-            user-select: none;
-            -webkit-touch-callout: none;
-        }
+			background: linear-gradient(135deg, #ff6b6b, #ff8787);
+			color: white;
+			border: none;
+			border-radius: 1.25rem;
+			padding: 0.75rem 1.5rem;
+			font-size: clamp(0.9rem, 2.5vw, 1rem);
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+			font-family: 'Noto Sans KR', sans-serif;
+			touch-action: manipulation;
+			position: relative;
+			z-index: 100; /* z-index 증가 */
+			
+			/* 모바일 터치 최적화 강화 */
+			-webkit-tap-highlight-color: rgba(255, 107, 107, 0.3);
+			-webkit-appearance: none;
+			appearance: none;
+			-webkit-user-select: none;
+			user-select: none;
+			-webkit-touch-callout: none;
+			
+			/* 터치 영역 확대 */
+			min-height: 48px; /* 최소 터치 영역 */
+			min-width: 120px;
+			
+			/* 포인터 이벤트 강제 활성화 */
+			pointer-events: auto !important;
+		}
 
-        /* 모바일 터치 영역 확대 */
-        @media (hover: none) and (pointer: coarse) {
-            .back-btn {
-                padding: 1rem 2rem;
-                min-height: 44px;
-                min-width: 120px;
-            }
-        }
+		/* 모바일 터치 영역 더 확대 */
+		@media (hover: none) and (pointer: coarse) {
+			.back-btn {
+				padding: 1rem 2rem;
+				min-height: 52px; /* 터치 영역 더 확대 */
+				min-width: 140px;
+				font-size: 1rem;
+			}
+		}
+
+		.back-btn:hover {
+			transform: translateY(-3px);
+			box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+		}
+
+		.back-btn:active {
+			transform: translateY(0) scale(0.98);
+		}
 
         .back-btn:hover {
             transform: translateY(-3px);
@@ -866,11 +884,26 @@
                 max-width: 280px;
             }
 
-            .nav-bar {
-                flex-direction: column;
-                align-items: center;
-                gap: 0.5rem;
-            }
+            
+			.nav-bar {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 1.5rem;
+				padding: 0.5rem;
+				gap: 1rem;
+				flex-wrap: wrap;
+				position: relative;
+				z-index: 50; /* z-index 조정 */
+				min-height: 60px;
+				
+				/* 터치 이벤트 차단 방지 */
+				pointer-events: none; /* nav-bar 자체는 이벤트 차단 */
+			}
+
+			.nav-bar > * {
+				pointer-events: auto; /* 자식 요소들은 이벤트 허용 */
+			}
 
             .back-btn {
                 order: 1;
@@ -1710,23 +1743,60 @@
 
         // 학습 화면 표시
         function showLearningScreen() {
-            document.getElementById('main-screen').style.display = 'none';
-            document.getElementById('learning-screen').style.display = 'block';
-            document.getElementById('completion-screen').style.display = 'none';
-            
-            const icon = currentCategory.split(' ')[0];
-            const title = currentCategory.split(' ').slice(1).join(' ');
-            
-            // 네비게이션 바를 다른 버튼들처럼 동적으로 생성
-            const navBar = document.getElementById('nav-bar');
-            navBar.innerHTML = `
-                <button class="back-btn" onclick="showMainScreen()">← 처음으로</button>
-                <h2 class="current-category"><span class="emoji">${icon}</span> ${title}</h2>
-            `;
-            
-            // 화면 전환 후 이모지 수정 재적용
-            setTimeout(fixIOSEmoji, 100);
-        }
+			document.getElementById('main-screen').style.display = 'none';
+			document.getElementById('learning-screen').style.display = 'block';
+			document.getElementById('completion-screen').style.display = 'none';
+			
+			const icon = currentCategory.split(' ')[0];
+			const title = currentCategory.split(' ').slice(1).join(' ');
+			
+			// 네비게이션 바 생성
+			const navBar = document.getElementById('nav-bar');
+			navBar.innerHTML = `
+				<button class="back-btn" id="back-to-main">← 처음으로</button>
+				<h2 class="current-category"><span class="emoji">${icon}</span> ${title}</h2>
+			`;
+			
+			// JavaScript로 이벤트 리스너 직접 추가 (모바일 호환성 향상)
+			const backButton = document.getElementById('back-to-main');
+			if (backButton) {
+				// 기존 이벤트 리스너 제거
+				backButton.removeEventListener('click', showMainScreen);
+				backButton.removeEventListener('touchend', showMainScreen);
+				
+				// 클릭 이벤트 추가
+				backButton.addEventListener('click', function(e) {
+					e.preventDefault();
+					e.stopPropagation();
+					console.log('back button clicked');
+					showMainScreen();
+				});
+				
+				// 터치 이벤트 추가 (모바일 전용)
+				backButton.addEventListener('touchend', function(e) {
+					e.preventDefault();
+					e.stopPropagation();
+					console.log('back button touched');
+					showMainScreen();
+				});
+				
+				// 모바일 터치 피드백
+				backButton.addEventListener('touchstart', function(e) {
+					this.style.transform = 'scale(0.95)';
+					this.style.opacity = '0.8';
+				}, { passive: true });
+				
+				backButton.addEventListener('touchend', function(e) {
+					setTimeout(() => {
+						this.style.transform = '';
+						this.style.opacity = '';
+					}, 150);
+				}, { passive: true });
+			}
+			
+			// 화면 전환 후 이모지 수정 재적용
+			setTimeout(fixIOSEmoji, 100);
+		}
 
         // 완료 화면 표시
         function showCompletionScreen() {
