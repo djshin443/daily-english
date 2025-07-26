@@ -31,26 +31,38 @@
             --text-primary: #1a202c;
         }
 
-        /* 이모지 스타일 최적화 */
+        /* iOS 이모지 스타일 최적화 - 수정됨 */
         .emoji {
-            font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'EmojiOne Color', 'Android Emoji', sans-serif;
-            font-style: normal;
-            font-weight: normal;
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji" !important;
+            font-style: normal !important;
+            font-weight: normal !important;
             display: inline-block;
             line-height: 1;
             vertical-align: baseline;
             margin: 0 0.125em;
+            /* iOS 전용 설정 */
+            font-variant-emoji: emoji !important;
+            text-rendering: optimizeSpeed !important;
+            -webkit-font-feature-settings: "liga" off;
+            font-feature-settings: "liga" off;
         }
 
         .category-icon {
-            font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'EmojiOne Color', 'Android Emoji', sans-serif;
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji" !important;
             font-size: clamp(2.5rem, 8vw, 3.5rem);
             line-height: 1;
             display: inline-block;
             vertical-align: middle;
             margin-bottom: 1rem;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
             text-align: center;
+            font-style: normal !important;
+            font-weight: normal !important;
+            /* iOS 전용 설정 */
+            font-variant-emoji: emoji !important;
+            text-rendering: optimizeSpeed !important;
+            -webkit-font-feature-settings: "liga" off;
+            font-feature-settings: "liga" off;
+            /* filter 제거 (iOS에서 문제 야기) */
         }
 
         /* 기본 스타일 */
@@ -1246,6 +1258,45 @@
             }
         });
 
+        // iOS 이모지 문제 해결 함수 - 추가됨
+        function fixIOSEmoji() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            
+            if (isIOS) {
+                console.log('iOS 감지됨 - 이모지 최적화 적용');
+                
+                // 모든 이모지 요소에 Unicode variation selector 추가
+                const emojiElements = document.querySelectorAll('.emoji, .category-icon');
+                emojiElements.forEach(element => {
+                    const text = element.textContent || element.innerText;
+                    if (text) {
+                        // Unicode variation selector-16 (U+FE0F) 추가로 컬러 이모지 강제
+                        const colorEmoji = text.replace(/[\u{1F000}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, 
+                            match => match + '\uFE0F');
+                        element.textContent = colorEmoji;
+                    }
+                    
+                    // iOS 전용 스타일 강제 적용
+                    element.style.fontFamily = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji"';
+                    element.style.fontVariantEmoji = 'emoji';
+                    element.style.textRendering = 'optimizeSpeed';
+                });
+                
+                // iOS 전용 CSS 추가
+                const style = document.createElement('style');
+                style.textContent = `
+                    .emoji, .category-icon {
+                        font-family: "Apple Color Emoji" !important;
+                        -webkit-font-feature-settings: normal !important;
+                        font-feature-settings: normal !important;
+                        font-variant-emoji: emoji !important;
+                        text-rendering: optimizeSpeed !important;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+
         // 앱 초기화 함수
         function initializeApp() {
             if (!sentencesDataLoaded) {
@@ -1346,6 +1397,9 @@
                     
                     grid.appendChild(card);
                 });
+                
+                // 카드 생성 후 이모지 수정 재적용
+                setTimeout(fixIOSEmoji, 100);
             }
 
             // 메뉴 닫기 헬퍼 함수
@@ -1403,6 +1457,9 @@
                 const icon = currentCategory.split(' ')[0];
                 const title = currentCategory.split(' ').slice(1).join(' ');
                 document.getElementById('current-category').innerHTML = `<span class="emoji">${icon}</span> ${title}`;
+                
+                // 화면 전환 후 이모지 수정 재적용
+                setTimeout(fixIOSEmoji, 100);
             }
 
             // 메인 화면 표시
@@ -1418,6 +1475,9 @@
                 document.getElementById('main-screen').style.display = 'none';
                 document.getElementById('learning-screen').style.display = 'none';
                 document.getElementById('completion-screen').style.display = 'block';
+                
+                // 완료 화면 표시 후 이모지 수정 재적용
+                setTimeout(fixIOSEmoji, 100);
             }
 
             // 현재 문장 로드
@@ -1504,6 +1564,9 @@
                         <button class="primary-btn" onclick="nextSentence()">${nextButtonText}</button>
                     `;
                 }
+                
+                // 버튼 업데이트 후 이모지 수정 재적용
+                setTimeout(fixIOSEmoji, 50);
             }
 
             // 다음 문장으로
@@ -1768,9 +1831,18 @@
             createCategoryCards();
         }
 
-        // 페이지 로드 시 스크립트 로드 시작
+        // 페이지 로드 시 스크립트 로드 시작 - 수정됨
         document.addEventListener('DOMContentLoaded', function() {
+            // 이모지 수정 함수 먼저 실행
+            setTimeout(fixIOSEmoji, 100);
+            
+            // 기존 스크립트 로드
             loadSentencesScript();
+        });
+
+        // 페이지 완전 로드 후에도 한 번 더 적용 - 추가됨
+        window.addEventListener('load', function() {
+            setTimeout(fixIOSEmoji, 200);
         });
     </script>
 </body>
