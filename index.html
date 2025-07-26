@@ -83,19 +83,21 @@
 
         body {
             font-family: 'Jua', 'Noto Sans KR', 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
-            /* iOS 배경 문제 해결 - 강력한 fallback 추가 */
-            background: #667eea !important; /* iOS fallback */
+            /* iOS 배경 문제 해결 - 최강 강제 설정 */
+            background-color: #667eea !important;
+            background-image: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
-            min-height: 100vh;
-            min-height: -webkit-fill-available;
+            min-height: 100vh !important;
+            min-height: -webkit-fill-available !important;
             color: var(--text-primary);
             overflow-x: hidden;
             position: relative;
             
             /* iOS 전용 설정 추가 */
-            -webkit-background-size: cover;
-            background-size: cover;
-            background-attachment: scroll; /* iOS에서 fixed 문제 해결 */
+            -webkit-background-size: cover !important;
+            background-size: cover !important;
+            background-attachment: scroll !important;
+            background-repeat: no-repeat !important;
         }
 
         /* 배경 애니메이션 - 모바일에서는 성능을 위해 단순화 */
@@ -1158,10 +1160,10 @@
         </div>
 
         <!-- 메뉴 오버레이 -->
-        <div class="menu-overlay" id="menu-overlay" onclick="toggleControlPanel()"></div>
+        <div class="menu-overlay" id="menu-overlay" onclick="window.toggleControlPanel ? window.toggleControlPanel() : console.error('toggleControlPanel 함수 없음')"></div>
 
         <!-- 햄버거 메뉴 버튼 -->
-        <button class="menu-toggle-btn" onclick="toggleControlPanel()">
+        <button class="menu-toggle-btn" onclick="window.toggleControlPanel ? window.toggleControlPanel() : console.error('toggleControlPanel 함수 없음')">
             <span></span>
             <span></span>
             <span></span>
@@ -1172,13 +1174,13 @@
             <div class="control-panel" id="control-panel">
                 <div class="control-title"><span class="emoji">🎮</span> 학습 관리</div>
                 <div class="control-buttons">
-                    <button class="control-btn reset-btn" onclick="resetAllProgress()"><span class="emoji">🗑️</span> 전체 초기화</button>
-                    <button class="control-btn info-btn" onclick="showDetailedProgress()"><span class="emoji">📊</span> 카테고리별 진도</button>
-                    <button class="control-btn info-btn" onclick="exportProgress()"><span class="emoji">💾</span> 진도 백업</button>
-                    <button class="control-btn info-btn" onclick="importProgress()"><span class="emoji">📂</span> 진도 불러오기</button>
+                    <button class="control-btn reset-btn" onclick="window.resetAllProgress ? window.resetAllProgress() : console.error('resetAllProgress 함수 없음')"><span class="emoji">🗑️</span> 전체 초기화</button>
+                    <button class="control-btn info-btn" onclick="window.showDetailedProgress ? window.showDetailedProgress() : console.error('showDetailedProgress 함수 없음')"><span class="emoji">📊</span> 카테고리별 진도</button>
+                    <button class="control-btn info-btn" onclick="window.exportProgress ? window.exportProgress() : console.error('exportProgress 함수 없음')"><span class="emoji">💾</span> 진도 백업</button>
+                    <button class="control-btn info-btn" onclick="window.importProgress ? window.importProgress() : console.error('importProgress 함수 없음')"><span class="emoji">📂</span> 진도 불러오기</button>
                 </div>
                 <!-- 숨겨진 파일 입력 -->
-                <input type="file" id="progress-file-input" accept=".json" style="display: none;" onchange="handleProgressFile(this)">
+                <input type="file" id="progress-file-input" accept=".json" style="display: none;" onchange="window.handleProgressFile ? window.handleProgressFile(this) : console.error('handleProgressFile 함수 없음')">
             </div>
         </div>
 
@@ -1197,7 +1199,7 @@
         <!-- 학습 화면 -->
         <div id="learning-screen" class="learning-screen">
             <div class="nav-bar">
-                <button class="back-btn" onclick="showMainScreen()">← 처음으로</button>
+                <button class="back-btn" onclick="window.showMainScreen ? window.showMainScreen() : console.error('showMainScreen 함수 없음')">← 처음으로</button>
                 <h2 class="current-category" id="current-category"></h2>
                 <div style="width: 1px;"></div>
             </div>
@@ -1216,8 +1218,8 @@
             <div class="completion-title"><span class="emoji">🎉</span> 축하합니다! <span class="emoji">🎉</span></div>
             <div class="completion-message">모든 영어 문장을 마스터했어요!</div>
             <div class="action-buttons">
-                <button class="secondary-btn" onclick="startReviewMode()"><span class="emoji">📚</span> 복습 모드</button>
-                <button class="primary-btn" onclick="resetAllProgress()"><span class="emoji">🔄</span> 처음부터 다시</button>
+                <button class="secondary-btn" onclick="window.startReviewMode ? window.startReviewMode() : console.error('startReviewMode 함수 없음')"><span class="emoji">📚</span> 복습 모드</button>
+                <button class="primary-btn" onclick="window.resetAllProgress ? window.resetAllProgress() : console.error('resetAllProgress 함수 없음')"><span class="emoji">🔄</span> 처음부터 다시</button>
             </div>
         </div>
     </div>
@@ -1268,22 +1270,26 @@
             document.head.appendChild(script);
         }
 
-        // 메뉴 토글 함수
-        window.toggleControlPanel = function() {
+        // 메뉴 토글 함수 - 전역으로 확실히 노출
+        function toggleControlPanel() {
+            console.log('메뉴 토글 실행');
             const panel = document.getElementById('control-panel');
             const toggleBtn = document.querySelector('.menu-toggle-btn');
             const overlay = document.getElementById('menu-overlay');
             
-            if (panel.classList.contains('show')) {
+            if (panel && panel.classList.contains('show')) {
                 panel.classList.remove('show');
-                toggleBtn.classList.remove('active');
-                overlay.classList.remove('show');
+                if (toggleBtn) toggleBtn.classList.remove('active');
+                if (overlay) overlay.classList.remove('show');
             } else {
-                panel.classList.add('show');
-                toggleBtn.classList.add('active');
-                overlay.classList.add('show');
+                if (panel) panel.classList.add('show');
+                if (toggleBtn) toggleBtn.classList.add('active');
+                if (overlay) overlay.classList.add('show');
             }
         }
+        
+        // 전역 노출
+        window.toggleControlPanel = toggleControlPanel;
 
         // 문서 클릭 시 메뉴 닫기
         document.addEventListener('click', function(event) {
@@ -1338,6 +1344,20 @@
                 document.head.appendChild(style);
             }
         }
+
+        // 배경 강제 설정 함수 - 전역
+        function forceBackgroundFix() {
+            console.log('배경 강제 설정 적용');
+            document.body.style.backgroundColor = '#667eea';
+            document.body.style.backgroundImage = 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)';
+            document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)';
+            document.body.style.backgroundAttachment = 'scroll';
+            document.body.style.backgroundRepeat = 'no-repeat';
+            document.body.style.backgroundSize = 'cover';
+        }
+
+        // 전역 노출
+        window.forceBackgroundFix = forceBackgroundFix;
 
         // 앱 초기화 함수
         function initializeApp() {
@@ -1504,18 +1524,21 @@
                 setTimeout(fixIOSEmoji, 100);
             }
 
-            // 메인 화면 표시
-            window.showMainScreen = function() {
+            // 메인 화면 표시 - 전역 함수로 확실히 노출
+            function showMainScreen() {
+                console.log('메인화면으로 이동');
                 document.getElementById('main-screen').style.display = 'block';
                 document.getElementById('learning-screen').style.display = 'none';
                 document.getElementById('completion-screen').style.display = 'none';
                 
-                // iOS 배경 강제 유지
-                document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)';
-                document.body.style.backgroundColor = '#667eea';
+                // iOS 배경 강제 재설정
+                forceBackgroundFix();
                 
                 createCategoryCards();
             }
+            
+            // 전역으로 노출
+            window.showMainScreen = showMainScreen;
 
             // 완료 화면 표시
             function showCompletionScreen() {
@@ -1637,8 +1660,8 @@
                 }
             }
 
-            // 전체 초기화
-            window.resetAllProgress = function() {
+            // 전체 초기화 - 전역 함수로 확실히 노출
+            function resetAllProgress() {
                 if (confirm('정말로 모든 학습 진도를 초기화하시겠습니까?')) {
                     localStorage.removeItem(CACHE_KEY);
                     userProgress = loadProgress();
@@ -1647,9 +1670,10 @@
                     closeControlPanel();
                 }
             }
+            window.resetAllProgress = resetAllProgress;
 
-            // 상세 진도 표시
-            window.showDetailedProgress = function() {
+            // 상세 진도 표시 - 전역 함수로 확실히 노출
+            function showDetailedProgress() {
                 let progressText = '📊 카테고리별 학습 진도\n\n';
                 
                 Object.keys(sentencesData).forEach(category => {
@@ -1662,27 +1686,22 @@
                 alert(progressText);
                 closeControlPanel();
             }
+            window.showDetailedProgress = showDetailedProgress;
 
-            // 진도 백업
-            window.exportProgress = function() {
-                // 현재 날짜로 기본 파일명 생성
+            // 진도 백업 - 전역 함수로 확실히 노출
+            function exportProgress() {
                 const today = new Date();
-                const dateString = today.toISOString().split('T')[0]; // YYYY-MM-DD 형식
+                const dateString = today.toISOString().split('T')[0];
                 const defaultFileName = `영어학습진도_${dateString}`;
                 
-                // 사용자에게 파일명 입력 받기
                 const fileName = prompt('백업 파일명을 입력하세요:', defaultFileName);
                 
-                if (fileName === null) {
-                    return; // 취소 버튼 클릭 시
-                }
-                
+                if (fileName === null) return;
                 if (fileName.trim() === '') {
                     alert('파일명을 입력해주세요.');
                     return;
                 }
                 
-                // 백업 데이터 생성 (메타데이터 포함)
                 const backupData = {
                     version: '1.0',
                     exportDate: new Date().toISOString(),
@@ -1706,17 +1725,19 @@
                 alert(`진도가 "${fileName.trim()}.json" 파일로 저장되었습니다.`);
                 closeControlPanel();
             }
+            window.exportProgress = exportProgress;
 
-            // 진도 불러오기
-            window.importProgress = function() {
+            // 진도 불러오기 - 전역 함수로 확실히 노출
+            function importProgress() {
                 const fileInput = document.getElementById('progress-file-input');
                 if (fileInput) {
                     fileInput.click();
                 }
             }
+            window.importProgress = importProgress;
 
-            // 파일 처리
-            window.handleProgressFile = function(input) {
+            // 파일 처리 - 전역 함수로 확실히 노출
+            function handleProgressFile(input) {
                 const file = input.files[0];
                 if (!file) return;
                 
@@ -1731,26 +1752,20 @@
                     try {
                         const data = JSON.parse(e.target.result);
                         
-                        // 데이터 검증
                         if (!validateProgressData(data)) {
                             alert('올바르지 않은 진도 파일입니다.');
                             return;
                         }
                         
-                        // 기존 진도와 비교하여 확인 메시지 표시
                         const confirmMessage = createImportConfirmMessage(data);
                         if (confirm(confirmMessage)) {
-                            // 진도 데이터 추출 (버전에 따라 다르게 처리)
                             let newProgress;
                             if (data.version && data.progress) {
-                                // 새 형식 (메타데이터 포함)
                                 newProgress = data.progress;
                             } else {
-                                // 구 형식 (진도 데이터만)
                                 newProgress = data;
                             }
                             
-                            // 현재 카테고리와 맞지 않는 경우 기본값으로 보정
                             Object.keys(sentencesData).forEach(category => {
                                 if (!(category in newProgress)) {
                                     newProgress[category] = 0;
@@ -1768,12 +1783,12 @@
                         alert('파일을 읽는 중 오류가 발생했습니다.');
                     }
                     
-                    // 파일 입력 초기화
                     input.value = '';
                 };
                 
                 reader.readAsText(file);
             }
+            window.handleProgressFile = handleProgressFile;
 
             // 진도 데이터 검증
             function validateProgressData(data) {
@@ -1834,14 +1849,40 @@
             }
 
             // 답 표시 함수를 전역으로 노출
-            window.showAnswer = showAnswer;
-
-            // 답 숨기기
-            window.hideAnswer = function() {
-                // 빈칸을 다시 원래 상태로
+            function showAnswer() {
                 const blankSpace = document.getElementById('blank-space');
                 if (blankSpace) {
-                    // 숨기기 애니메이션 추가
+                    blankSpace.textContent = currentAnswer;
+                    blankSpace.classList.add('revealed');
+                }
+                
+                const answerSection = document.getElementById('answer-section');
+                if (answerSection) {
+                    const sentence = sentencesData[currentCategory][currentSentenceIndex];
+                    const allAnswers = sentence.answers;
+                    
+                    let answersHtml = '<div class="answer-display">';
+                    answersHtml += '<div class="answer-text">가능한 예시들:</div>';
+                    answersHtml += '<div class="all-answers">';
+                    
+                    allAnswers.forEach((answer, index) => {
+                        const isCurrentAnswer = answer === currentAnswer;
+                        answersHtml += `<span class="answer-item ${isCurrentAnswer ? 'current' : ''}">${answer}</span>`;
+                    });
+                    
+                    answersHtml += '</div></div>';
+                    answerSection.innerHTML = answersHtml;
+                }
+                
+                isAnswerVisible = true;
+                updateActionButtons();
+            }
+            window.showAnswer = showAnswer;
+
+            // 답 숨기기 - 전역 함수로 확실히 노출
+            function hideAnswer() {
+                const blankSpace = document.getElementById('blank-space');
+                if (blankSpace) {
                     blankSpace.classList.add('hiding');
                     
                     setTimeout(() => {
@@ -1853,7 +1894,6 @@
                     }, 300);
                 }
                 
-                // 답변 섹션 페이드아웃 효과
                 const answerSection = document.getElementById('answer-section');
                 if (answerSection) {
                     answerSection.style.opacity = '0';
@@ -1867,25 +1907,75 @@
                 
                 isAnswerVisible = false;
                 
-                // 버튼 업데이트를 약간 지연
                 setTimeout(() => {
                     updateActionButtons();
                 }, 350);
             }
+            window.hideAnswer = hideAnswer;
+
+            // 다음 문장으로 - 전역 함수로 확실히 노출
+            function nextSentence() {
+                if (!isReviewMode) {
+                    userProgress[currentCategory] = Math.max(userProgress[currentCategory] || 0, currentSentenceIndex + 1);
+                    saveProgress(userProgress);
+                }
+                
+                currentSentenceIndex++;
+                
+                if (currentSentenceIndex >= sentencesData[currentCategory].length) {
+                    if (isReviewMode) {
+                        showMainScreen();
+                    } else {
+                        showCompletionScreen();
+                    }
+                } else {
+                    loadCurrentSentence();
+                }
+            }
+            window.nextSentence = nextSentence;
+
+            // 복습 모드 시작 - 전역 함수로 확실히 노출
+            function startReviewMode() {
+                if (!currentCategory) return;
+                
+                isReviewMode = true;
+                currentSentenceIndex = 0;
+                showLearningScreen();
+                loadCurrentSentence();
+            }
+            window.startReviewMode = startReviewMode;
 
             // 초기화
             updateDateDisplay();
             createCategoryCards();
             
-            // iOS 메인화면 배경 강제 설정
-            setTimeout(() => {
-                document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)';
-                document.body.style.backgroundColor = '#667eea';
-            }, 100);
+            // 배경 강제 설정 (초기화 시)
+            forceBackgroundFix();
+            
+            // 주기적으로 배경 체크 및 재설정 (iOS 대응)
+            setInterval(() => {
+                const currentBg = window.getComputedStyle(document.body).background;
+                if (!currentBg.includes('gradient') || currentBg.includes('rgb(255, 255, 255)')) {
+                    console.log('배경 재설정 필요 - 강제 적용');
+                    forceBackgroundFix();
+                }
+            }, 2000);
         }
 
         // 페이지 로드 시 스크립트 로드 시작 - 수정됨
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('페이지 로드 완료');
+            
+            // 배경 즉시 강제 설정
+            if (window.forceBackgroundFix) {
+                forceBackgroundFix();
+            } else {
+                // forceBackgroundFix가 아직 정의되지 않은 경우 직접 설정
+                document.body.style.backgroundColor = '#667eea';
+                document.body.style.backgroundImage = 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)';
+                document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)';
+            }
+            
             // 이모지 수정 함수 먼저 실행
             setTimeout(fixIOSEmoji, 100);
             
@@ -1895,7 +1985,19 @@
 
         // 페이지 완전 로드 후에도 한 번 더 적용 - 추가됨
         window.addEventListener('load', function() {
-            setTimeout(fixIOSEmoji, 200);
+            console.log('페이지 완전 로드 완료');
+            
+            // 배경 재설정
+            setTimeout(() => {
+                if (window.forceBackgroundFix) {
+                    forceBackgroundFix();
+                } else {
+                    document.body.style.backgroundColor = '#667eea';
+                    document.body.style.backgroundImage = 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)';
+                    document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)';
+                }
+                fixIOSEmoji();
+            }, 200);
         });
     </script>
 </body>
