@@ -894,11 +894,9 @@
 				gap: 1rem;
 				flex-wrap: wrap;
 				position: relative;
-				z-index: 50; /* z-index 조정 */
+				z-index: 10;
 				min-height: 60px;
-				
-				/* 터치 이벤트 차단 방지 */
-				pointer-events: none; /* nav-bar 자체는 이벤트 차단 */
+				/* pointer-events: none; 이 줄을 제거! */
 			}
 
 			.nav-bar > * {
