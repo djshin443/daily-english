@@ -25,7 +25,7 @@
 
         :root {
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --glass-bg: rgba(255, 255, 255, 0.3);
+			--glass-bg: rgba(255, 255, 255, 0.15);
             --glass-border: rgba(255, 255, 255, 0.25);
             --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
             --text-primary: #1a202c;
@@ -1031,15 +1031,15 @@
         }
 
         @supports not (backdrop-filter: blur(15px)) {
-            .category-card,
-            .control-panel,
-            .sentence-card,
-            .date-header,
-            .completion-screen,
-            .error-screen {
-                background: rgba(255, 255, 255, 0.9); /* fallback 더 진하게 */
-            }
-        }
+			.category-card,
+			.control-panel,
+			.sentence-card,
+			.date-header,
+			.completion-screen,
+			.error-screen {
+				background: rgba(255, 255, 255, 0.25); /* ← 투명하게 */
+			}
+		}
 
 		/* iOS에서 투명도 줄이기 (저전력 모드 대비) */
         @media (prefers-reduced-transparency: reduce) {
