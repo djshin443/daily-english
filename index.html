@@ -65,14 +65,6 @@
             /* filter 제거 (iOS에서 문제 야기) */
         }
 
-        /* 메인화면 투명 유지 - iOS 배경 문제 해결 */
-        #main-screen, 
-        .title-section, 
-        .categories-grid {
-            background: transparent !important;
-            background-color: transparent !important;
-        }
-
         /* 기본 스타일 */
         html {
             font-size: 16px;
@@ -96,7 +88,7 @@
             /* iOS 전용 설정 추가 */
             -webkit-background-size: cover !important;
             background-size: cover !important;
-            background-attachment: scroll !important;
+            background-attachment: fixed !important;
             background-repeat: no-repeat !important;
         }
 
@@ -125,7 +117,27 @@
             padding: 1rem;
             min-height: 100vh;
             min-height: -webkit-fill-available;
-            background: transparent !important; /* 메인화면 투명 유지 */
+            background: transparent !important;
+        }
+
+        /* iOS 전용 메인 화면 배경 수정 */
+        #main-screen {
+            position: relative;
+            z-index: 1;
+            background: transparent;
+        }
+
+        /* iOS에서 메인화면에 배경 강제 적용을 위한 가상 요소 */
+        #main-screen::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
+            z-index: -1;
+            pointer-events: none;
         }
 
         /* 에러 화면 스타일 */
@@ -210,7 +222,9 @@
             text-align: center;
             margin-bottom: 2rem;
             animation: bounceIn 1.2s ease-out;
-            background: transparent !important; /* 투명 유지 */
+            background: transparent !important;
+            position: relative;
+            z-index: 2;
         }
 
         .main-title {
@@ -410,7 +424,9 @@
             grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
             gap: 1.25rem;
             margin-bottom: 2rem;
-            background: transparent !important; /* 투명 유지 */
+            background: transparent !important;
+            position: relative;
+            z-index: 2;
         }
 
         .category-card {
@@ -1054,7 +1070,11 @@
         @supports (-webkit-appearance: none) {
             body {
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-                background-attachment: scroll !important;
+                background-attachment: fixed !important;
+            }
+            
+            #main-screen::before {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
             }
             
             .category-card,
@@ -1091,6 +1111,11 @@
             body {
                 background: #667eea !important;
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                background-attachment: fixed !important;
+            }
+            
+            #main-screen::before {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
             }
             
             .category-card, .control-panel, .sentence-card, 
@@ -1098,11 +1123,6 @@
                 background: rgba(102, 126, 234, 0.8) !important;
                 backdrop-filter: none !important;
                 -webkit-backdrop-filter: none !important;
-            }
-            
-            /* 메인화면 투명 유지 */
-            #main-screen, .container, .title-section, .categories-grid {
-                background: transparent !important;
             }
         }
 
@@ -1160,10 +1180,10 @@
         </div>
 
         <!-- 메뉴 오버레이 -->
-        <div class="menu-overlay" id="menu-overlay" onclick="window.toggleControlPanel ? window.toggleControlPanel() : console.error('toggleControlPanel 함수 없음')"></div>
+        <div class="menu-overlay" id="menu-overlay" onclick="toggleControlPanel()"></div>
 
         <!-- 햄버거 메뉴 버튼 -->
-        <button class="menu-toggle-btn" onclick="window.toggleControlPanel ? window.toggleControlPanel() : console.error('toggleControlPanel 함수 없음')">
+        <button class="menu-toggle-btn" onclick="toggleControlPanel()">
             <span></span>
             <span></span>
             <span></span>
@@ -1174,13 +1194,13 @@
             <div class="control-panel" id="control-panel">
                 <div class="control-title"><span class="emoji">🎮</span> 학습 관리</div>
                 <div class="control-buttons">
-                    <button class="control-btn reset-btn" onclick="window.resetAllProgress ? window.resetAllProgress() : console.error('resetAllProgress 함수 없음')"><span class="emoji">🗑️</span> 전체 초기화</button>
-                    <button class="control-btn info-btn" onclick="window.showDetailedProgress ? window.showDetailedProgress() : console.error('showDetailedProgress 함수 없음')"><span class="emoji">📊</span> 카테고리별 진도</button>
-                    <button class="control-btn info-btn" onclick="window.exportProgress ? window.exportProgress() : console.error('exportProgress 함수 없음')"><span class="emoji">💾</span> 진도 백업</button>
-                    <button class="control-btn info-btn" onclick="window.importProgress ? window.importProgress() : console.error('importProgress 함수 없음')"><span class="emoji">📂</span> 진도 불러오기</button>
+                    <button class="control-btn reset-btn" onclick="resetAllProgress()"><span class="emoji">🗑️</span> 전체 초기화</button>
+                    <button class="control-btn info-btn" onclick="showDetailedProgress()"><span class="emoji">📊</span> 카테고리별 진도</button>
+                    <button class="control-btn info-btn" onclick="exportProgress()"><span class="emoji">💾</span> 진도 백업</button>
+                    <button class="control-btn info-btn" onclick="importProgress()"><span class="emoji">📂</span> 진도 불러오기</button>
                 </div>
                 <!-- 숨겨진 파일 입력 -->
-                <input type="file" id="progress-file-input" accept=".json" style="display: none;" onchange="window.handleProgressFile ? window.handleProgressFile(this) : console.error('handleProgressFile 함수 없음')">
+                <input type="file" id="progress-file-input" accept=".json" style="display: none;" onchange="handleProgressFile(this)">
             </div>
         </div>
 
@@ -1199,7 +1219,7 @@
         <!-- 학습 화면 -->
         <div id="learning-screen" class="learning-screen">
             <div class="nav-bar">
-                <button class="back-btn" onclick="window.showMainScreen ? window.showMainScreen() : console.error('showMainScreen 함수 없음')">← 처음으로</button>
+                <button class="back-btn" onclick="showMainScreen()">← 처음으로</button>
                 <h2 class="current-category" id="current-category"></h2>
                 <div style="width: 1px;"></div>
             </div>
@@ -1218,17 +1238,592 @@
             <div class="completion-title"><span class="emoji">🎉</span> 축하합니다! <span class="emoji">🎉</span></div>
             <div class="completion-message">모든 영어 문장을 마스터했어요!</div>
             <div class="action-buttons">
-                <button class="secondary-btn" onclick="window.startReviewMode ? window.startReviewMode() : console.error('startReviewMode 함수 없음')"><span class="emoji">📚</span> 복습 모드</button>
-                <button class="primary-btn" onclick="window.resetAllProgress ? window.resetAllProgress() : console.error('resetAllProgress 함수 없음')"><span class="emoji">🔄</span> 처음부터 다시</button>
+                <button class="secondary-btn" onclick="startReviewMode()"><span class="emoji">📚</span> 복습 모드</button>
+                <button class="primary-btn" onclick="resetAllProgress()"><span class="emoji">🔄</span> 처음부터 다시</button>
             </div>
         </div>
     </div>
 
     <!-- JavaScript 파일 로드 -->
     <script>
-        // sentences.js 파일 로드 상태 체크
+        // 전역 변수들 (initializeApp 밖으로 이동)
         let sentencesDataLoaded = false;
         let sentencesData = null;
+        let currentCategory = '';
+        let currentSentenceIndex = 0;
+        let isAnswerVisible = false;
+        let currentAnswer = '';
+        let isReviewMode = false;
+        let userProgress = {};
+        
+        // 영구 캐시 키
+        const CACHE_KEY = 'englishLearning_permanentCache';
+        
+        // 카테고리 설명
+        const categoryDescriptions = {
+            "🏠 일상생활": "집에서 하는 일상적인 활동들을 영어로 표현해요",
+            "🎒 학교": "학교에서 일어나는 다양한 상황들을 영어로 말해요",
+            "🍕 식당": "음식점에서 사용하는 영어 표현들을 배워요",
+            "⚽ 운동": "스포츠와 운동에 관련된 영어를 연습해요",
+            "✈️ 여행": "여행지에서 필요한 영어 표현들을 익혀요",
+            "👨‍👩‍👧 가족/친구": "가족과 친구들과의 관계를 영어로 표현해요"
+        };
+
+        // =============== 전역 함수들 시작 (initializeApp 밖으로 이동) ===============
+
+        // 메뉴 토글 함수
+        function toggleControlPanel() {
+            console.log('메뉴 토글 실행');
+            const panel = document.getElementById('control-panel');
+            const toggleBtn = document.querySelector('.menu-toggle-btn');
+            const overlay = document.getElementById('menu-overlay');
+            
+            if (panel && panel.classList.contains('show')) {
+                panel.classList.remove('show');
+                if (toggleBtn) toggleBtn.classList.remove('active');
+                if (overlay) overlay.classList.remove('show');
+            } else {
+                if (panel) panel.classList.add('show');
+                if (toggleBtn) toggleBtn.classList.add('active');
+                if (overlay) overlay.classList.add('show');
+            }
+        }
+
+        // 메뉴 닫기 헬퍼 함수
+        function closeControlPanel() {
+            const panel = document.getElementById('control-panel');
+            const toggleBtn = document.querySelector('.menu-toggle-btn');
+            const overlay = document.getElementById('menu-overlay');
+            
+            if (panel && panel.classList.contains('show')) {
+                panel.classList.remove('show');
+            }
+            if (toggleBtn && toggleBtn.classList.contains('active')) {
+                toggleBtn.classList.remove('active');
+            }
+            if (overlay && overlay.classList.contains('show')) {
+                overlay.classList.remove('show');
+            }
+        }
+
+        // 메인 화면 표시
+        function showMainScreen() {
+            console.log('메인화면으로 이동');
+            document.getElementById('main-screen').style.display = 'block';
+            document.getElementById('learning-screen').style.display = 'none';
+            document.getElementById('completion-screen').style.display = 'none';
+            
+            // iOS 배경 강제 재설정
+            forceBackgroundFix();
+            
+            createCategoryCards();
+        }
+
+        // 전체 초기화
+        function resetAllProgress() {
+            if (confirm('정말로 모든 학습 진도를 초기화하시겠습니까?')) {
+                localStorage.removeItem(CACHE_KEY);
+                userProgress = loadProgress();
+                showMainScreen();
+                alert('모든 진도가 초기화되었습니다.');
+                closeControlPanel();
+            }
+        }
+
+        // 상세 진도 표시
+        function showDetailedProgress() {
+            let progressText = '📊 카테고리별 학습 진도\n\n';
+            
+            Object.keys(sentencesData).forEach(category => {
+                const total = sentencesData[category].length;
+                const completed = userProgress[category] || 0;
+                const percentage = Math.round((completed / total) * 100);
+                progressText += `${category}: ${completed}/${total} (${percentage}%)\n`;
+            });
+            
+            alert(progressText);
+            closeControlPanel();
+        }
+
+        // 진도 백업
+        function exportProgress() {
+            const today = new Date();
+            const dateString = today.toISOString().split('T')[0];
+            const defaultFileName = `영어학습진도_${dateString}`;
+            
+            const fileName = prompt('백업 파일명을 입력하세요:', defaultFileName);
+            
+            if (fileName === null) return;
+            if (fileName.trim() === '') {
+                alert('파일명을 입력해주세요.');
+                return;
+            }
+            
+            const backupData = {
+                version: '1.0',
+                exportDate: new Date().toISOString(),
+                totalCategories: Object.keys(sentencesData).length,
+                progress: userProgress,
+                categories: Object.keys(sentencesData)
+            };
+            
+            const progressData = JSON.stringify(backupData, null, 2);
+            const blob = new Blob([progressData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${fileName.trim()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert(`진도가 "${fileName.trim()}.json" 파일로 저장되었습니다.`);
+            closeControlPanel();
+        }
+
+        // 진도 불러오기
+        function importProgress() {
+            const fileInput = document.getElementById('progress-file-input');
+            if (fileInput) {
+                fileInput.click();
+            }
+        }
+
+        // 파일 처리
+        function handleProgressFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            if (!file.name.toLowerCase().endsWith('.json')) {
+                alert('JSON 파일만 업로드 가능합니다.');
+                input.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (!validateProgressData(data)) {
+                        alert('올바르지 않은 진도 파일입니다.');
+                        return;
+                    }
+                    
+                    const confirmMessage = createImportConfirmMessage(data);
+                    if (confirm(confirmMessage)) {
+                        let newProgress;
+                        if (data.version && data.progress) {
+                            newProgress = data.progress;
+                        } else {
+                            newProgress = data;
+                        }
+                        
+                        Object.keys(sentencesData).forEach(category => {
+                            if (!(category in newProgress)) {
+                                newProgress[category] = 0;
+                            }
+                        });
+                        
+                        userProgress = newProgress;
+                        saveProgress(userProgress);
+                        createCategoryCards();
+                        alert('진도가 성공적으로 불러와졌습니다!');
+                        closeControlPanel();
+                    }
+                } catch (error) {
+                    console.error('파일 읽기 오류:', error);
+                    alert('파일을 읽는 중 오류가 발생했습니다.');
+                }
+                
+                input.value = '';
+            };
+            
+            reader.readAsText(file);
+        }
+
+        // 복습 모드 시작
+        function startReviewMode() {
+            if (!currentCategory) return;
+            
+            isReviewMode = true;
+            currentSentenceIndex = 0;
+            showLearningScreen();
+            loadCurrentSentence();
+        }
+
+        // 답 표시
+        function showAnswer() {
+            const blankSpace = document.getElementById('blank-space');
+            if (blankSpace) {
+                blankSpace.textContent = currentAnswer;
+                blankSpace.classList.add('revealed');
+            }
+            
+            const answerSection = document.getElementById('answer-section');
+            if (answerSection) {
+                const sentence = sentencesData[currentCategory][currentSentenceIndex];
+                const allAnswers = sentence.answers;
+                
+                let answersHtml = '<div class="answer-display">';
+                answersHtml += '<div class="answer-text">가능한 예시들:</div>';
+                answersHtml += '<div class="all-answers">';
+                
+                allAnswers.forEach((answer, index) => {
+                    const isCurrentAnswer = answer === currentAnswer;
+                    answersHtml += `<span class="answer-item ${isCurrentAnswer ? 'current' : ''}">${answer}</span>`;
+                });
+                
+                answersHtml += '</div></div>';
+                answerSection.innerHTML = answersHtml;
+            }
+            
+            isAnswerVisible = true;
+            updateActionButtons();
+        }
+
+        // 답 숨기기
+        function hideAnswer() {
+            const blankSpace = document.getElementById('blank-space');
+            if (blankSpace) {
+                blankSpace.classList.add('hiding');
+                
+                setTimeout(() => {
+                    blankSpace.textContent = '_____';
+                    blankSpace.classList.remove('revealed');
+                    blankSpace.classList.remove('hiding');
+                    blankSpace.style.background = 'linear-gradient(135deg, #ffeaa7, #fdcb6e)';
+                    blankSpace.style.color = '#2d3436';
+                }, 300);
+            }
+            
+            const answerSection = document.getElementById('answer-section');
+            if (answerSection) {
+                answerSection.style.opacity = '0';
+                answerSection.style.transition = 'opacity 0.3s ease';
+                
+                setTimeout(() => {
+                    answerSection.innerHTML = '';
+                    answerSection.style.opacity = '1';
+                }, 300);
+            }
+            
+            isAnswerVisible = false;
+            
+            setTimeout(() => {
+                updateActionButtons();
+            }, 350);
+        }
+
+        // 다음 문장으로
+        function nextSentence() {
+            if (!isReviewMode) {
+                userProgress[currentCategory] = Math.max(userProgress[currentCategory] || 0, currentSentenceIndex + 1);
+                saveProgress(userProgress);
+            }
+            
+            currentSentenceIndex++;
+            
+            if (currentSentenceIndex >= sentencesData[currentCategory].length) {
+                if (isReviewMode) {
+                    showMainScreen();
+                } else {
+                    showCompletionScreen();
+                }
+            } else {
+                loadCurrentSentence();
+            }
+        }
+
+        // =============== 전역 함수들 끝 ===============
+
+        // =============== 내부 함수들 시작 ===============
+
+        // 캐시에서 진도 불러오기
+        function loadProgress() {
+            try {
+                const cached = localStorage.getItem(CACHE_KEY);
+                if (cached) {
+                    return JSON.parse(cached);
+                }
+            } catch (error) {
+                console.error('진도 로드 실패:', error);
+            }
+            
+            // 기본 진도 생성
+            const defaultProgress = {};
+            if (sentencesData) {
+                Object.keys(sentencesData).forEach(category => {
+                    defaultProgress[category] = 0;
+                });
+            }
+            return defaultProgress;
+        }
+
+        // 진도 저장하기
+        function saveProgress(progress) {
+            try {
+                localStorage.setItem(CACHE_KEY, JSON.stringify(progress));
+            } catch (error) {
+                console.error('진도 저장 실패:', error);
+            }
+        }
+
+        // 날짜 표시 업데이트
+        function updateDateDisplay() {
+            const today = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+            };
+            const dateString = today.toLocaleDateString('ko-KR', options);
+            document.getElementById('today-date').innerHTML = `<span class="emoji">📅</span> ${dateString}`;
+        }
+
+        // 카테고리 카드 생성
+        function createCategoryCards() {
+            const grid = document.getElementById('categories-grid');
+            if (!grid || !sentencesData) return;
+            
+            grid.innerHTML = '';
+            
+            Object.keys(sentencesData).forEach(category => {
+                const totalSentences = sentencesData[category].length;
+                const completedSentences = userProgress[category] || 0;
+                const progressPercentage = Math.round((completedSentences / totalSentences) * 100);
+                
+                const card = document.createElement('div');
+                card.className = 'category-card';
+                card.onclick = () => startCategory(category);
+                
+                const icon = category.split(' ')[0];
+                const title = category.split(' ').slice(1).join(' ');
+                
+                card.innerHTML = `
+                    <span class="category-icon" aria-label="${title}">${icon}</span>
+                    <h3 class="category-title">${title}</h3>
+                    <p class="category-description">${categoryDescriptions[category]}</p>
+                    <div class="category-progress">
+                        <span class="emoji">📈</span> 진도: ${completedSentences}/${totalSentences} (${progressPercentage}%)
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+            
+            // 카드 생성 후 이모지 수정 재적용
+            setTimeout(fixIOSEmoji, 100);
+        }
+
+        // 카테고리 시작
+        function startCategory(category) {
+            currentCategory = category;
+            currentSentenceIndex = userProgress[category] || 0;
+            isReviewMode = false;
+            
+            // 메뉴 닫기
+            closeControlPanel();
+            
+            // 모든 문장을 완료한 경우
+            if (currentSentenceIndex >= sentencesData[category].length) {
+                showCompletionScreen();
+                return;
+            }
+            
+            showLearningScreen();
+            loadCurrentSentence();
+        }
+
+        // 학습 화면 표시
+        function showLearningScreen() {
+            document.getElementById('main-screen').style.display = 'none';
+            document.getElementById('learning-screen').style.display = 'block';
+            document.getElementById('completion-screen').style.display = 'none';
+            
+            const icon = currentCategory.split(' ')[0];
+            const title = currentCategory.split(' ').slice(1).join(' ');
+            document.getElementById('current-category').innerHTML = `<span class="emoji">${icon}</span> ${title}`;
+            
+            // 화면 전환 후 이모지 수정 재적용
+            setTimeout(fixIOSEmoji, 100);
+        }
+
+        // 완료 화면 표시
+        function showCompletionScreen() {
+            document.getElementById('main-screen').style.display = 'none';
+            document.getElementById('learning-screen').style.display = 'none';
+            document.getElementById('completion-screen').style.display = 'block';
+            
+            // 완료 화면 표시 후 이모지 수정 재적용
+            setTimeout(fixIOSEmoji, 100);
+        }
+
+        // 현재 문장 로드
+        function loadCurrentSentence() {
+            if (!sentencesData[currentCategory] || currentSentenceIndex >= sentencesData[currentCategory].length) {
+                if (!isReviewMode) {
+                    showCompletionScreen();
+                } else {
+                    showMainScreen();
+                }
+                return;
+            }
+            
+            const sentence = sentencesData[currentCategory][currentSentenceIndex];
+            currentAnswer = sentence.answers[Math.floor(Math.random() * sentence.answers.length)];
+            isAnswerVisible = false;
+            
+            displaySentence(sentence.pattern, currentAnswer);
+            updateActionButtons();
+        }
+
+        // 문장 표시
+        function displaySentence(pattern, answer) {
+            const display = document.getElementById('sentence-display');
+            if (!display) return;
+            
+            const sentenceHtml = pattern.replace('[blank]', 
+                `<span class="blank-space" id="blank-space">_____</span>`
+            );
+            
+            display.innerHTML = sentenceHtml;
+            document.getElementById('answer-section').innerHTML = '';
+        }
+
+        // 액션 버튼 업데이트
+        function updateActionButtons() {
+            const buttonsContainer = document.getElementById('action-buttons');
+            if (!buttonsContainer) return;
+            
+            if (!isAnswerVisible) {
+                buttonsContainer.innerHTML = `
+                    <button class="primary-btn" onclick="showAnswer()"><span class="emoji">💡</span> 예시 확인</button>
+                `;
+            } else {
+                const isLastSentence = currentSentenceIndex >= sentencesData[currentCategory].length - 1;
+                const nextButtonText = isReviewMode ? 
+                    (isLastSentence ? '복습 완료' : '다음 문장') : 
+                    (isLastSentence ? '카테고리 완료!' : '다음 문장');
+                
+                buttonsContainer.innerHTML = `
+                    <button class="secondary-btn" onclick="hideAnswer()"><span class="emoji">👀</span> 예시 숨기기</button>
+                    <button class="primary-btn" onclick="nextSentence()">${nextButtonText}</button>
+                `;
+            }
+            
+            // 버튼 업데이트 후 이모지 수정 재적용
+            setTimeout(fixIOSEmoji, 50);
+        }
+
+        // 진도 데이터 검증
+        function validateProgressData(data) {
+            try {
+                // 새 형식 검증
+                if (data.version && data.progress) {
+                    if (typeof data.progress !== 'object') return false;
+                    
+                    // 진도 값들이 숫자인지 확인
+                    for (let category in data.progress) {
+                        if (typeof data.progress[category] !== 'number' || data.progress[category] < 0) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                
+                // 구 형식 검증 (직접 진도 객체)
+                if (typeof data === 'object' && data !== null) {
+                    for (let category in data) {
+                        if (typeof data[category] !== 'number' || data[category] < 0) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                
+                return false;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        // 불러오기 확인 메시지 생성
+        function createImportConfirmMessage(data) {
+            let message = '📂 진도 파일 정보:\n\n';
+            
+            if (data.version && data.exportDate) {
+                message += `📅 백업 날짜: ${new Date(data.exportDate).toLocaleDateString('ko-KR')}\n`;
+                message += `📊 카테고리 수: ${data.totalCategories || 'Unknown'}\n\n`;
+            }
+            
+            message += '📈 불러올 진도:\n';
+            
+            // 진도 데이터 추출
+            const progressToLoad = data.version ? data.progress : data;
+            
+            Object.keys(sentencesData).forEach(category => {
+                const currentProgress = userProgress[category] || 0;
+                const newProgress = progressToLoad[category] || 0;
+                const total = sentencesData[category].length;
+                
+                message += `${category}: ${currentProgress}/${total} → ${newProgress}/${total}\n`;
+            });
+            
+            message += '\n현재 진도를 덮어쓰시겠습니까?';
+            return message;
+        }
+
+        // =============== 내부 함수들 끝 ===============
+
+        // iOS 이모지 문제 해결 함수
+        function fixIOSEmoji() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            
+            if (isIOS) {
+                console.log('iOS 감지됨 - 이모지 최적화 적용');
+                
+                const emojiElements = document.querySelectorAll('.emoji, .category-icon');
+                emojiElements.forEach(element => {
+                    const text = element.textContent || element.innerText;
+                    if (text) {
+                        const colorEmoji = text.replace(/[\u{1F000}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, 
+                            match => match + '\uFE0F');
+                        element.textContent = colorEmoji;
+                    }
+                    
+                    element.style.fontFamily = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji"';
+                    element.style.fontVariantEmoji = 'emoji';
+                    element.style.textRendering = 'optimizeSpeed';
+                });
+                
+                const style = document.createElement('style');
+                style.textContent = `
+                    .emoji, .category-icon {
+                        font-family: "Apple Color Emoji" !important;
+                        -webkit-font-feature-settings: normal !important;
+                        font-feature-settings: normal !important;
+                        font-variant-emoji: emoji !important;
+                        text-rendering: optimizeSpeed !important;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+
+        // 배경 강제 설정 함수
+        function forceBackgroundFix() {
+            console.log('배경 강제 설정 적용');
+            document.body.style.backgroundColor = '#667eea';
+            document.body.style.backgroundImage = 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)';
+            document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)';
+            document.body.style.backgroundAttachment = 'fixed';
+            document.body.style.backgroundRepeat = 'no-repeat';
+            document.body.style.backgroundSize = 'cover';
+        }
 
         // 파일 로드 에러 처리 함수
         function handleScriptError() {
@@ -1261,7 +1856,6 @@
             const script = document.createElement('script');
             script.src = 'sentences.js';
             script.onload = function() {
-                // 스크립트 로드 후 데이터 체크
                 setTimeout(checkDataLoaded, 100);
             };
             script.onerror = function() {
@@ -1270,95 +1864,6 @@
             document.head.appendChild(script);
         }
 
-        // 메뉴 토글 함수 - 전역으로 확실히 노출
-        function toggleControlPanel() {
-            console.log('메뉴 토글 실행');
-            const panel = document.getElementById('control-panel');
-            const toggleBtn = document.querySelector('.menu-toggle-btn');
-            const overlay = document.getElementById('menu-overlay');
-            
-            if (panel && panel.classList.contains('show')) {
-                panel.classList.remove('show');
-                if (toggleBtn) toggleBtn.classList.remove('active');
-                if (overlay) overlay.classList.remove('show');
-            } else {
-                if (panel) panel.classList.add('show');
-                if (toggleBtn) toggleBtn.classList.add('active');
-                if (overlay) overlay.classList.add('show');
-            }
-        }
-        
-        // 전역 노출
-        window.toggleControlPanel = toggleControlPanel;
-
-        // 문서 클릭 시 메뉴 닫기
-        document.addEventListener('click', function(event) {
-            const panel = document.getElementById('control-panel');
-            const toggleBtn = document.querySelector('.menu-toggle-btn');
-            const overlay = document.getElementById('menu-overlay');
-            const isClickInsidePanel = panel.contains(event.target);
-            const isClickOnToggle = toggleBtn.contains(event.target);
-            
-            if (!isClickInsidePanel && !isClickOnToggle && panel.classList.contains('show')) {
-                panel.classList.remove('show');
-                toggleBtn.classList.remove('active');
-                overlay.classList.remove('show');
-            }
-        });
-
-        // iOS 이모지 문제 해결 함수 - 추가됨
-        function fixIOSEmoji() {
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            
-            if (isIOS) {
-                console.log('iOS 감지됨 - 이모지 최적화 적용');
-                
-                // 모든 이모지 요소에 Unicode variation selector 추가
-                const emojiElements = document.querySelectorAll('.emoji, .category-icon');
-                emojiElements.forEach(element => {
-                    const text = element.textContent || element.innerText;
-                    if (text) {
-                        // Unicode variation selector-16 (U+FE0F) 추가로 컬러 이모지 강제
-                        const colorEmoji = text.replace(/[\u{1F000}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, 
-                            match => match + '\uFE0F');
-                        element.textContent = colorEmoji;
-                    }
-                    
-                    // iOS 전용 스타일 강제 적용
-                    element.style.fontFamily = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji"';
-                    element.style.fontVariantEmoji = 'emoji';
-                    element.style.textRendering = 'optimizeSpeed';
-                });
-                
-                // iOS 전용 CSS 추가
-                const style = document.createElement('style');
-                style.textContent = `
-                    .emoji, .category-icon {
-                        font-family: "Apple Color Emoji" !important;
-                        -webkit-font-feature-settings: normal !important;
-                        font-feature-settings: normal !important;
-                        font-variant-emoji: emoji !important;
-                        text-rendering: optimizeSpeed !important;
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-        }
-
-        // 배경 강제 설정 함수 - 전역
-        function forceBackgroundFix() {
-            console.log('배경 강제 설정 적용');
-            document.body.style.backgroundColor = '#667eea';
-            document.body.style.backgroundImage = 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)';
-            document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)';
-            document.body.style.backgroundAttachment = 'scroll';
-            document.body.style.backgroundRepeat = 'no-repeat';
-            document.body.style.backgroundSize = 'cover';
-        }
-
-        // 전역 노출
-        window.forceBackgroundFix = forceBackgroundFix;
-
         // 앱 초기화 함수
         function initializeApp() {
             if (!sentencesDataLoaded) {
@@ -1366,585 +1871,9 @@
                 return;
             }
 
-            // 영구 캐시 시스템
-            const CACHE_KEY = 'englishLearning_permanentCache';
+            // 진도 로드
+            userProgress = loadProgress();
             
-            // 전역 변수들
-            let currentCategory = '';
-            let currentSentenceIndex = 0;
-            let isAnswerVisible = false;
-            let currentAnswer = '';
-            let isReviewMode = false;
-
-            // 카테고리 설명
-            const categoryDescriptions = {
-                "🏠 일상생활": "집에서 하는 일상적인 활동들을 영어로 표현해요",
-                "🎒 학교": "학교에서 일어나는 다양한 상황들을 영어로 말해요",
-                "🍕 식당": "음식점에서 사용하는 영어 표현들을 배워요",
-                "⚽ 운동": "스포츠와 운동에 관련된 영어를 연습해요",
-                "✈️ 여행": "여행지에서 필요한 영어 표현들을 익혀요",
-                "👨‍👩‍👧 가족/친구": "가족과 친구들과의 관계를 영어로 표현해요"
-            };
-
-            // 캐시에서 진도 불러오기
-            function loadProgress() {
-                try {
-                    const cached = localStorage.getItem(CACHE_KEY);
-                    if (cached) {
-                        return JSON.parse(cached);
-                    }
-                } catch (error) {
-                    console.error('진도 로드 실패:', error);
-                }
-                
-                // 기본 진도 생성
-                const defaultProgress = {};
-                Object.keys(sentencesData).forEach(category => {
-                    defaultProgress[category] = 0;
-                });
-                return defaultProgress;
-            }
-
-            // 진도 저장하기
-            function saveProgress(progress) {
-                try {
-                    localStorage.setItem(CACHE_KEY, JSON.stringify(progress));
-                } catch (error) {
-                    console.error('진도 저장 실패:', error);
-                }
-            }
-
-            let userProgress = loadProgress();
-
-            // 날짜 표시 업데이트
-            function updateDateDisplay() {
-                const today = new Date();
-                const options = { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric',
-                    weekday: 'long'
-                };
-                const dateString = today.toLocaleDateString('ko-KR', options);
-                document.getElementById('today-date').innerHTML = `<span class="emoji">📅</span> ${dateString}`;
-            }
-
-            // 카테고리 카드 생성
-            function createCategoryCards() {
-                const grid = document.getElementById('categories-grid');
-                if (!grid) return;
-                
-                grid.innerHTML = '';
-                
-                Object.keys(sentencesData).forEach(category => {
-                    const totalSentences = sentencesData[category].length;
-                    const completedSentences = userProgress[category] || 0;
-                    const progressPercentage = Math.round((completedSentences / totalSentences) * 100);
-                    
-                    const card = document.createElement('div');
-                    card.className = 'category-card';
-                    card.onclick = () => startCategory(category);
-                    
-                    const icon = category.split(' ')[0];
-                    const title = category.split(' ').slice(1).join(' ');
-                    
-                    card.innerHTML = `
-                        <span class="category-icon" aria-label="${title}">${icon}</span>
-                        <h3 class="category-title">${title}</h3>
-                        <p class="category-description">${categoryDescriptions[category]}</p>
-                        <div class="category-progress">
-                            <span class="emoji">📈</span> 진도: ${completedSentences}/${totalSentences} (${progressPercentage}%)
-                        </div>
-                    `;
-                    
-                    grid.appendChild(card);
-                });
-                
-                // 카드 생성 후 이모지 수정 재적용
-                setTimeout(fixIOSEmoji, 100);
-            }
-
-            // 메뉴 닫기 헬퍼 함수
-            function closeControlPanel() {
-                const panel = document.getElementById('control-panel');
-                const toggleBtn = document.querySelector('.menu-toggle-btn');
-                const overlay = document.getElementById('menu-overlay');
-                
-                if (panel && panel.classList.contains('show')) {
-                    panel.classList.remove('show');
-                }
-                if (toggleBtn && toggleBtn.classList.contains('active')) {
-                    toggleBtn.classList.remove('active');
-                }
-                if (overlay && overlay.classList.contains('show')) {
-                    overlay.classList.remove('show');
-                }
-            }
-
-            // 카테고리 시작
-            function startCategory(category) {
-                currentCategory = category;
-                currentSentenceIndex = userProgress[category] || 0;
-                isReviewMode = false;
-                
-                // 메뉴 닫기
-                closeControlPanel();
-                
-                // 모든 문장을 완료한 경우
-                if (currentSentenceIndex >= sentencesData[category].length) {
-                    showCompletionScreen();
-                    return;
-                }
-                
-                showLearningScreen();
-                loadCurrentSentence();
-            }
-
-            // 복습 모드 시작
-            window.startReviewMode = function() {
-                if (!currentCategory) return;
-                
-                isReviewMode = true;
-                currentSentenceIndex = 0;
-                showLearningScreen();
-                loadCurrentSentence();
-            }
-
-            // 학습 화면 표시
-            function showLearningScreen() {
-                document.getElementById('main-screen').style.display = 'none';
-                document.getElementById('learning-screen').style.display = 'block';
-                document.getElementById('completion-screen').style.display = 'none';
-                
-                const icon = currentCategory.split(' ')[0];
-                const title = currentCategory.split(' ').slice(1).join(' ');
-                document.getElementById('current-category').innerHTML = `<span class="emoji">${icon}</span> ${title}`;
-                
-                // 화면 전환 후 이모지 수정 재적용
-                setTimeout(fixIOSEmoji, 100);
-            }
-
-            // 메인 화면 표시 - 전역 함수로 확실히 노출
-            function showMainScreen() {
-                console.log('메인화면으로 이동');
-                document.getElementById('main-screen').style.display = 'block';
-                document.getElementById('learning-screen').style.display = 'none';
-                document.getElementById('completion-screen').style.display = 'none';
-                
-                // iOS 배경 강제 재설정
-                forceBackgroundFix();
-                
-                createCategoryCards();
-            }
-            
-            // 전역으로 노출
-            window.showMainScreen = showMainScreen;
-
-            // 완료 화면 표시
-            function showCompletionScreen() {
-                document.getElementById('main-screen').style.display = 'none';
-                document.getElementById('learning-screen').style.display = 'none';
-                document.getElementById('completion-screen').style.display = 'block';
-                
-                // 완료 화면 표시 후 이모지 수정 재적용
-                setTimeout(fixIOSEmoji, 100);
-            }
-
-            // 현재 문장 로드
-            function loadCurrentSentence() {
-                if (!sentencesData[currentCategory] || currentSentenceIndex >= sentencesData[currentCategory].length) {
-                    if (!isReviewMode) {
-                        showCompletionScreen();
-                    } else {
-                        showMainScreen();
-                    }
-                    return;
-                }
-                
-                const sentence = sentencesData[currentCategory][currentSentenceIndex];
-                currentAnswer = sentence.answers[Math.floor(Math.random() * sentence.answers.length)];
-                isAnswerVisible = false;
-                
-                displaySentence(sentence.pattern, currentAnswer);
-                updateActionButtons();
-            }
-
-            // 문장 표시
-            function displaySentence(pattern, answer) {
-                const display = document.getElementById('sentence-display');
-                if (!display) return;
-                
-                const sentenceHtml = pattern.replace('[blank]', 
-                    `<span class="blank-space" id="blank-space">_____</span>`
-                );
-                
-                display.innerHTML = sentenceHtml;
-                document.getElementById('answer-section').innerHTML = '';
-            }
-
-            // 답 표시
-            function showAnswer() {
-                const blankSpace = document.getElementById('blank-space');
-                if (blankSpace) {
-                    blankSpace.textContent = currentAnswer;
-                    blankSpace.classList.add('revealed');
-                }
-                
-                const answerSection = document.getElementById('answer-section');
-                if (answerSection) {
-                    // 현재 문장의 모든 답변 가져오기
-                    const sentence = sentencesData[currentCategory][currentSentenceIndex];
-                    const allAnswers = sentence.answers;
-                    
-                    // 모든 답변을 표시
-                    let answersHtml = '<div class="answer-display">';
-                    answersHtml += '<div class="answer-text">가능한 예시들:</div>';
-                    answersHtml += '<div class="all-answers">';
-                    
-                    allAnswers.forEach((answer, index) => {
-                        const isCurrentAnswer = answer === currentAnswer;
-                        answersHtml += `<span class="answer-item ${isCurrentAnswer ? 'current' : ''}">${answer}</span>`;
-                    });
-                    
-                    answersHtml += '</div></div>';
-                    answerSection.innerHTML = answersHtml;
-                }
-                
-                isAnswerVisible = true;
-                updateActionButtons();
-            }
-
-            // 액션 버튼 업데이트
-            function updateActionButtons() {
-                const buttonsContainer = document.getElementById('action-buttons');
-                if (!buttonsContainer) return;
-                
-                if (!isAnswerVisible) {
-                    buttonsContainer.innerHTML = `
-                        <button class="primary-btn" onclick="showAnswer()"><span class="emoji">💡</span> 예시 확인</button>
-                    `;
-                } else {
-                    const isLastSentence = currentSentenceIndex >= sentencesData[currentCategory].length - 1;
-                    const nextButtonText = isReviewMode ? 
-                        (isLastSentence ? '복습 완료' : '다음 문장') : 
-                        (isLastSentence ? '카테고리 완료!' : '다음 문장');
-                    
-                    buttonsContainer.innerHTML = `
-                        <button class="secondary-btn" onclick="hideAnswer()"><span class="emoji">👀</span> 예시 숨기기</button>
-                        <button class="primary-btn" onclick="nextSentence()">${nextButtonText}</button>
-                    `;
-                }
-                
-                // 버튼 업데이트 후 이모지 수정 재적용
-                setTimeout(fixIOSEmoji, 50);
-            }
-
-            // 다음 문장으로
-            window.nextSentence = function() {
-                if (!isReviewMode) {
-                    // 일반 모드: 진도 저장
-                    userProgress[currentCategory] = Math.max(userProgress[currentCategory] || 0, currentSentenceIndex + 1);
-                    saveProgress(userProgress);
-                }
-                
-                currentSentenceIndex++;
-                
-                if (currentSentenceIndex >= sentencesData[currentCategory].length) {
-                    if (isReviewMode) {
-                        showMainScreen();
-                    } else {
-                        showCompletionScreen();
-                    }
-                } else {
-                    loadCurrentSentence();
-                }
-            }
-
-            // 전체 초기화 - 전역 함수로 확실히 노출
-            function resetAllProgress() {
-                if (confirm('정말로 모든 학습 진도를 초기화하시겠습니까?')) {
-                    localStorage.removeItem(CACHE_KEY);
-                    userProgress = loadProgress();
-                    showMainScreen();
-                    alert('모든 진도가 초기화되었습니다.');
-                    closeControlPanel();
-                }
-            }
-            window.resetAllProgress = resetAllProgress;
-
-            // 상세 진도 표시 - 전역 함수로 확실히 노출
-            function showDetailedProgress() {
-                let progressText = '📊 카테고리별 학습 진도\n\n';
-                
-                Object.keys(sentencesData).forEach(category => {
-                    const total = sentencesData[category].length;
-                    const completed = userProgress[category] || 0;
-                    const percentage = Math.round((completed / total) * 100);
-                    progressText += `${category}: ${completed}/${total} (${percentage}%)\n`;
-                });
-                
-                alert(progressText);
-                closeControlPanel();
-            }
-            window.showDetailedProgress = showDetailedProgress;
-
-            // 진도 백업 - 전역 함수로 확실히 노출
-            function exportProgress() {
-                const today = new Date();
-                const dateString = today.toISOString().split('T')[0];
-                const defaultFileName = `영어학습진도_${dateString}`;
-                
-                const fileName = prompt('백업 파일명을 입력하세요:', defaultFileName);
-                
-                if (fileName === null) return;
-                if (fileName.trim() === '') {
-                    alert('파일명을 입력해주세요.');
-                    return;
-                }
-                
-                const backupData = {
-                    version: '1.0',
-                    exportDate: new Date().toISOString(),
-                    totalCategories: Object.keys(sentencesData).length,
-                    progress: userProgress,
-                    categories: Object.keys(sentencesData)
-                };
-                
-                const progressData = JSON.stringify(backupData, null, 2);
-                const blob = new Blob([progressData], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${fileName.trim()}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                alert(`진도가 "${fileName.trim()}.json" 파일로 저장되었습니다.`);
-                closeControlPanel();
-            }
-            window.exportProgress = exportProgress;
-
-            // 진도 불러오기 - 전역 함수로 확실히 노출
-            function importProgress() {
-                const fileInput = document.getElementById('progress-file-input');
-                if (fileInput) {
-                    fileInput.click();
-                }
-            }
-            window.importProgress = importProgress;
-
-            // 파일 처리 - 전역 함수로 확실히 노출
-            function handleProgressFile(input) {
-                const file = input.files[0];
-                if (!file) return;
-                
-                if (!file.name.toLowerCase().endsWith('.json')) {
-                    alert('JSON 파일만 업로드 가능합니다.');
-                    input.value = '';
-                    return;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const data = JSON.parse(e.target.result);
-                        
-                        if (!validateProgressData(data)) {
-                            alert('올바르지 않은 진도 파일입니다.');
-                            return;
-                        }
-                        
-                        const confirmMessage = createImportConfirmMessage(data);
-                        if (confirm(confirmMessage)) {
-                            let newProgress;
-                            if (data.version && data.progress) {
-                                newProgress = data.progress;
-                            } else {
-                                newProgress = data;
-                            }
-                            
-                            Object.keys(sentencesData).forEach(category => {
-                                if (!(category in newProgress)) {
-                                    newProgress[category] = 0;
-                                }
-                            });
-                            
-                            userProgress = newProgress;
-                            saveProgress(userProgress);
-                            createCategoryCards();
-                            alert('진도가 성공적으로 불러와졌습니다!');
-                            closeControlPanel();
-                        }
-                    } catch (error) {
-                        console.error('파일 읽기 오류:', error);
-                        alert('파일을 읽는 중 오류가 발생했습니다.');
-                    }
-                    
-                    input.value = '';
-                };
-                
-                reader.readAsText(file);
-            }
-            window.handleProgressFile = handleProgressFile;
-
-            // 진도 데이터 검증
-            function validateProgressData(data) {
-                try {
-                    // 새 형식 검증
-                    if (data.version && data.progress) {
-                        if (typeof data.progress !== 'object') return false;
-                        
-                        // 진도 값들이 숫자인지 확인
-                        for (let category in data.progress) {
-                            if (typeof data.progress[category] !== 'number' || data.progress[category] < 0) {
-                                return false;
-                            }
-                        }
-                        return true;
-                    }
-                    
-                    // 구 형식 검증 (직접 진도 객체)
-                    if (typeof data === 'object' && data !== null) {
-                        for (let category in data) {
-                            if (typeof data[category] !== 'number' || data[category] < 0) {
-                                return false;
-                            }
-                        }
-                        return true;
-                    }
-                    
-                    return false;
-                } catch (error) {
-                    return false;
-                }
-            }
-
-            // 불러오기 확인 메시지 생성
-            function createImportConfirmMessage(data) {
-                let message = '📂 진도 파일 정보:\n\n';
-                
-                if (data.version && data.exportDate) {
-                    message += `📅 백업 날짜: ${new Date(data.exportDate).toLocaleDateString('ko-KR')}\n`;
-                    message += `📊 카테고리 수: ${data.totalCategories || 'Unknown'}\n\n`;
-                }
-                
-                message += '📈 불러올 진도:\n';
-                
-                // 진도 데이터 추출
-                const progressToLoad = data.version ? data.progress : data;
-                
-                Object.keys(sentencesData).forEach(category => {
-                    const currentProgress = userProgress[category] || 0;
-                    const newProgress = progressToLoad[category] || 0;
-                    const total = sentencesData[category].length;
-                    
-                    message += `${category}: ${currentProgress}/${total} → ${newProgress}/${total}\n`;
-                });
-                
-                message += '\n현재 진도를 덮어쓰시겠습니까?';
-                return message;
-            }
-
-            // 답 표시 함수를 전역으로 노출
-            function showAnswer() {
-                const blankSpace = document.getElementById('blank-space');
-                if (blankSpace) {
-                    blankSpace.textContent = currentAnswer;
-                    blankSpace.classList.add('revealed');
-                }
-                
-                const answerSection = document.getElementById('answer-section');
-                if (answerSection) {
-                    const sentence = sentencesData[currentCategory][currentSentenceIndex];
-                    const allAnswers = sentence.answers;
-                    
-                    let answersHtml = '<div class="answer-display">';
-                    answersHtml += '<div class="answer-text">가능한 예시들:</div>';
-                    answersHtml += '<div class="all-answers">';
-                    
-                    allAnswers.forEach((answer, index) => {
-                        const isCurrentAnswer = answer === currentAnswer;
-                        answersHtml += `<span class="answer-item ${isCurrentAnswer ? 'current' : ''}">${answer}</span>`;
-                    });
-                    
-                    answersHtml += '</div></div>';
-                    answerSection.innerHTML = answersHtml;
-                }
-                
-                isAnswerVisible = true;
-                updateActionButtons();
-            }
-            window.showAnswer = showAnswer;
-
-            // 답 숨기기 - 전역 함수로 확실히 노출
-            function hideAnswer() {
-                const blankSpace = document.getElementById('blank-space');
-                if (blankSpace) {
-                    blankSpace.classList.add('hiding');
-                    
-                    setTimeout(() => {
-                        blankSpace.textContent = '_____';
-                        blankSpace.classList.remove('revealed');
-                        blankSpace.classList.remove('hiding');
-                        blankSpace.style.background = 'linear-gradient(135deg, #ffeaa7, #fdcb6e)';
-                        blankSpace.style.color = '#2d3436';
-                    }, 300);
-                }
-                
-                const answerSection = document.getElementById('answer-section');
-                if (answerSection) {
-                    answerSection.style.opacity = '0';
-                    answerSection.style.transition = 'opacity 0.3s ease';
-                    
-                    setTimeout(() => {
-                        answerSection.innerHTML = '';
-                        answerSection.style.opacity = '1';
-                    }, 300);
-                }
-                
-                isAnswerVisible = false;
-                
-                setTimeout(() => {
-                    updateActionButtons();
-                }, 350);
-            }
-            window.hideAnswer = hideAnswer;
-
-            // 다음 문장으로 - 전역 함수로 확실히 노출
-            function nextSentence() {
-                if (!isReviewMode) {
-                    userProgress[currentCategory] = Math.max(userProgress[currentCategory] || 0, currentSentenceIndex + 1);
-                    saveProgress(userProgress);
-                }
-                
-                currentSentenceIndex++;
-                
-                if (currentSentenceIndex >= sentencesData[currentCategory].length) {
-                    if (isReviewMode) {
-                        showMainScreen();
-                    } else {
-                        showCompletionScreen();
-                    }
-                } else {
-                    loadCurrentSentence();
-                }
-            }
-            window.nextSentence = nextSentence;
-
-            // 복습 모드 시작 - 전역 함수로 확실히 노출
-            function startReviewMode() {
-                if (!currentCategory) return;
-                
-                isReviewMode = true;
-                currentSentenceIndex = 0;
-                showLearningScreen();
-                loadCurrentSentence();
-            }
-            window.startReviewMode = startReviewMode;
-
             // 초기화
             updateDateDisplay();
             createCategoryCards();
@@ -1962,19 +1891,27 @@
             }, 2000);
         }
 
-        // 페이지 로드 시 스크립트 로드 시작 - 수정됨
+        // 문서 클릭 시 메뉴 닫기
+        document.addEventListener('click', function(event) {
+            const panel = document.getElementById('control-panel');
+            const toggleBtn = document.querySelector('.menu-toggle-btn');
+            const overlay = document.getElementById('menu-overlay');
+            const isClickInsidePanel = panel && panel.contains(event.target);
+            const isClickOnToggle = toggleBtn && toggleBtn.contains(event.target);
+            
+            if (!isClickInsidePanel && !isClickOnToggle && panel && panel.classList.contains('show')) {
+                panel.classList.remove('show');
+                if (toggleBtn) toggleBtn.classList.remove('active');
+                if (overlay) overlay.classList.remove('show');
+            }
+        });
+
+        // 페이지 로드 시 스크립트 로드 시작
         document.addEventListener('DOMContentLoaded', function() {
             console.log('페이지 로드 완료');
             
             // 배경 즉시 강제 설정
-            if (window.forceBackgroundFix) {
-                forceBackgroundFix();
-            } else {
-                // forceBackgroundFix가 아직 정의되지 않은 경우 직접 설정
-                document.body.style.backgroundColor = '#667eea';
-                document.body.style.backgroundImage = 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)';
-                document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)';
-            }
+            forceBackgroundFix();
             
             // 이모지 수정 함수 먼저 실행
             setTimeout(fixIOSEmoji, 100);
@@ -1983,19 +1920,13 @@
             loadSentencesScript();
         });
 
-        // 페이지 완전 로드 후에도 한 번 더 적용 - 추가됨
+        // 페이지 완전 로드 후에도 한 번 더 적용
         window.addEventListener('load', function() {
             console.log('페이지 완전 로드 완료');
             
             // 배경 재설정
             setTimeout(() => {
-                if (window.forceBackgroundFix) {
-                    forceBackgroundFix();
-                } else {
-                    document.body.style.backgroundColor = '#667eea';
-                    document.body.style.backgroundImage = 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)';
-                    document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)';
-                }
+                forceBackgroundFix();
                 fixIOSEmoji();
             }, 200);
         });
