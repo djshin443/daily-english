@@ -1417,15 +1417,18 @@
 			document.getElementById('learning-screen').style.display = 'none';
 			document.getElementById('completion-screen').style.display = 'none';
 			
-			// 고정 버튼 숨기기 - 이 부분이 누락되었음!
+			// 고정 버튼 숨기고 위치 초기화
 			const backBtn = document.getElementById('back-btn');
 			if (backBtn) {
 				backBtn.style.display = 'none';
+				// 위치 초기화
+				backBtn.style.top = '1rem';
+				backBtn.style.bottom = 'auto';
+				backBtn.style.left = '1rem';
+				backBtn.style.right = 'auto';
 			}
 			
-			// iOS 배경 강제 재설정
 			forceBackgroundFix();
-			
 			createCategoryCards();
 		}
 
@@ -1772,18 +1775,25 @@
 			document.getElementById('learning-screen').style.display = 'block';
 			document.getElementById('completion-screen').style.display = 'none';
 			
+			// 고정 버튼 표시하고 위치 조정
 			const backBtn = document.getElementById('back-btn');
 			if (backBtn) {
-				backBtn.style.display = 'none';
+				backBtn.style.display = 'block';
+				// 위치를 오른쪽 아래로 변경
+				backBtn.style.top = 'auto';
+				backBtn.style.bottom = '2rem';
+				backBtn.style.left = 'auto';
+				backBtn.style.right = '1rem';
+				backBtn.innerHTML = '← 처음으로';
 			}
 			
 			const icon = currentCategory.split(' ')[0];
 			const title = currentCategory.split(' ').slice(1).join(' ');
 			
+			// nav-bar에는 제목만 (중앙 배치)
 			const navBar = document.getElementById('nav-bar');
 			navBar.innerHTML = `
-				<button class="back-btn" onclick="showMainScreen()" style="min-width: 50px; padding: 0.75rem;">←</button>
-				<h2 class="current-category" style="flex: 1; text-align: center;">
+				<h2 class="current-category" style="width: 100%; text-align: center;">
 					<span class="emoji">${icon}</span> ${title}
 				</h2>
 			`;
