@@ -595,6 +595,10 @@
             animation: revealAnswer 0.8s ease-out;
         }
 
+        .blank-space.hiding {
+            animation: hideAnswerAnim 0.5s ease-out;
+        }
+
         /* 액션 버튼들 */
         .action-buttons {
             text-align: center;
@@ -658,6 +662,32 @@
             font-weight: 600;
             margin-bottom: 0.5rem;
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .all-answers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .answer-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .answer-item.current {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            border-color: rgba(255, 255, 255, 0.5);
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 184, 148, 0.4);
+            animation: pulse 2s ease-in-out infinite;
         }
 
         .hint-text {
@@ -759,6 +789,15 @@
             .blank-space {
                 display: block;
                 margin: 0.5rem auto;
+            }
+
+            .all-answers {
+                gap: 0.5rem;
+            }
+
+            .answer-item {
+                font-size: clamp(0.8rem, 2vw, 1rem);
+                padding: 0.4rem 0.8rem;
             }
 
             .action-buttons {
@@ -917,6 +956,20 @@
             100% {
                 transform: scale(1) rotateY(0deg);
                 opacity: 1;
+            }
+        }
+
+        @keyframes hideAnswerAnim {
+            0% {
+                transform: scale(1) rotateY(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1) rotateY(90deg);
+            }
+            100% {
+                transform: scale(1) rotateY(180deg);
+                opacity: 0.8;
             }
         }
 
@@ -1398,11 +1451,22 @@
                 
                 const answerSection = document.getElementById('answer-section');
                 if (answerSection) {
-                    answerSection.innerHTML = `
-                        <div class="answer-display">
-                            <div class="answer-text">예시: "${currentAnswer}"</div>
-                        </div>
-                    `;
+                    // 현재 문장의 모든 답변 가져오기
+                    const sentence = sentencesData[currentCategory][currentSentenceIndex];
+                    const allAnswers = sentence.answers;
+                    
+                    // 모든 답변을 표시
+                    let answersHtml = '<div class="answer-display">';
+                    answersHtml += '<div class="answer-text">가능한 예시들:</div>';
+                    answersHtml += '<div class="all-answers">';
+                    
+                    allAnswers.forEach((answer, index) => {
+                        const isCurrentAnswer = answer === currentAnswer;
+                        answersHtml += `<span class="answer-item ${isCurrentAnswer ? 'current' : ''}">${answer}</span>`;
+                    });
+                    
+                    answersHtml += '</div></div>';
+                    answerSection.innerHTML = answersHtml;
                 }
                 
                 isAnswerVisible = true;
@@ -1425,7 +1489,7 @@
                         (isLastSentence ? '카테고리 완료!' : '다음 문장');
                     
                     buttonsContainer.innerHTML = `
-                        <button class="secondary-btn" onclick="loadCurrentSentence()"><span class="emoji">🔄</span> 다시 보기</button>
+                        <button class="secondary-btn" onclick="hideAnswer()"><span class="emoji">👀</span> 예시 숨기기</button>
                         <button class="primary-btn" onclick="nextSentence()">${nextButtonText}</button>
                     `;
                 }
@@ -1650,6 +1714,43 @@
 
             // 답 표시 함수를 전역으로 노출
             window.showAnswer = showAnswer;
+
+            // 답 숨기기
+            window.hideAnswer = function() {
+                // 빈칸을 다시 원래 상태로
+                const blankSpace = document.getElementById('blank-space');
+                if (blankSpace) {
+                    // 숨기기 애니메이션 추가
+                    blankSpace.classList.add('hiding');
+                    
+                    setTimeout(() => {
+                        blankSpace.textContent = '_____';
+                        blankSpace.classList.remove('revealed');
+                        blankSpace.classList.remove('hiding');
+                        blankSpace.style.background = 'linear-gradient(135deg, #ffeaa7, #fdcb6e)';
+                        blankSpace.style.color = '#2d3436';
+                    }, 300);
+                }
+                
+                // 답변 섹션 페이드아웃 효과
+                const answerSection = document.getElementById('answer-section');
+                if (answerSection) {
+                    answerSection.style.opacity = '0';
+                    answerSection.style.transition = 'opacity 0.3s ease';
+                    
+                    setTimeout(() => {
+                        answerSection.innerHTML = '';
+                        answerSection.style.opacity = '1';
+                    }, 300);
+                }
+                
+                isAnswerVisible = false;
+                
+                // 버튼 업데이트를 약간 지연
+                setTimeout(() => {
+                    updateActionButtons();
+                }, 350);
+            }
 
             // 초기화
             updateDateDisplay();
