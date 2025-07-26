@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="format-detection" content="telephone=no">
     <title>오늘의 영어말하기</title>
-    <link href="https://fonts.googleapis.com/css2?family=Jua:wght@400&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Jua:wght@400&family=Noto+Sans+KR:wght@300;400;500;600;700&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -16,6 +19,8 @@
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         :root {
@@ -28,31 +33,57 @@
             --pastel-purple: #D1B3FF;
             --pastel-orange: #FFD1B3;
             
-            /* 글래스모피즘 */
-            --glass-bg: rgba(255, 255, 255, 0.25);
-            --glass-border: rgba(255, 255, 255, 0.18);
+            /* 글래스모피즘 - 모바일 최적화 */
+            --glass-bg: rgba(255, 255, 255, 0.3);
+            --glass-border: rgba(255, 255, 255, 0.25);
             --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
             
-            /* 텍스트 */
-            --text-primary: #2D3748;
-            --text-secondary: #718096;
-            --text-accent: #4A5568;
+            /* 텍스트 - 대비 향상 */
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --text-accent: #2d3748;
+        }
+
+        /* 이모지 스타일 최적화 */
+        .emoji {
+            font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'EmojiOne Color', 'Android Emoji', sans-serif;
+            font-style: normal;
+            font-weight: normal;
+            display: inline-block;
+            line-height: 1;
+            vertical-align: baseline;
+            margin: 0 0.125em;
+        }
+
+        .category-icon {
+            font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'EmojiOne Color', 'Android Emoji', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 3.5rem);
+            line-height: 1;
+            display: inline-block;
+            vertical-align: middle;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+            text-align: center;
         }
 
         /* 기본 스타일 */
         html {
             font-size: 16px;
             -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            text-size-adjust: 100%;
         }
 
         body {
-            font-family: 'Jua', 'Noto Sans KR', sans-serif;
+            font-family: 'Jua', 'Noto Sans KR', 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
             min-height: 100vh;
             min-height: -webkit-fill-available;
             color: var(--text-primary);
             overflow-x: hidden;
             position: relative;
+            -webkit-text-size-adjust: 100%;
+            text-rendering: optimizeLegibility;
         }
 
         /* 배경 애니메이션 - 모바일에서는 성능을 위해 단순화 */
@@ -169,16 +200,25 @@
         .main-title {
             font-size: clamp(2rem, 7vw, 4.5rem);
             font-weight: 700;
-            background: linear-gradient(45deg, #fff, #f0f8ff, #fff, #e6f3ff);
-            background-size: 400% 400%;
+            background: white;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: gradientShift 4s ease infinite;
+            color: white; /* 폴백 색상 */
             margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            text-shadow: 0 0 20px rgba(255,255,255,0.5), 0 0 40px rgba(255,255,255,0.3);
             font-family: 'Jua', sans-serif;
             line-height: 1.2;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 텍스트 그라디언트를 지원하지 않는 브라우저용 */
+        @supports not (-webkit-background-clip: text) {
+            .main-title {
+                background: none;
+                color: white;
+            }
         }
 
         .subtitle {
@@ -379,6 +419,7 @@
             overflow: hidden;
             animation: slideInUp 0.8s ease-out;
             touch-action: manipulation;
+            will-change: transform;
         }
 
         .category-card:hover {
@@ -403,13 +444,6 @@
 
         .category-card:hover::before {
             left: 100%;
-        }
-
-        .category-icon {
-            font-size: clamp(2.5rem, 8vw, 3.5rem);
-            margin-bottom: 1rem;
-            display: block;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
         }
 
         @media (min-width: 769px) {
@@ -664,6 +698,45 @@
             margin-bottom: 2rem;
         }
 
+        /* 모바일 최적화 */
+        @media (hover: none) and (pointer: coarse) {
+            /* 터치 디바이스 최적화 */
+            .category-card {
+                transition: transform 0.2s ease;
+            }
+            
+            .category-card:active {
+                transform: scale(0.98);
+            }
+            
+            /* 모바일에서 호버 효과 제거 */
+            .category-card:hover {
+                transform: none;
+                box-shadow: var(--glass-shadow);
+            }
+            
+            .category-card:hover::before {
+                left: -100%;
+            }
+            
+            /* 애니메이션 단순화 */
+            .category-icon {
+                animation: none;
+            }
+            
+            body::before {
+                animation: none;
+            }
+        }
+
+        /* 고해상도 디스플레이 최적화 */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .category-icon, .emoji {
+                -webkit-font-smoothing: antialiased;
+                text-rendering: optimizeLegibility;
+            }
+        }
+
         /* 작은 화면 반응형 (모바일) */
         @media (max-width: 480px) {
             .container {
@@ -889,6 +962,30 @@
             }
         }
 
+        /* backdrop-filter 지원 여부에 따른 조건부 스타일 */
+        @supports (backdrop-filter: blur(15px)) or (-webkit-backdrop-filter: blur(15px)) {
+            .category-card,
+            .control-panel,
+            .sentence-card,
+            .date-header,
+            .completion-screen,
+            .error-screen {
+                backdrop-filter: blur(15px);
+                -webkit-backdrop-filter: blur(15px);
+            }
+        }
+
+        @supports not (backdrop-filter: blur(15px)) {
+            .category-card,
+            .control-panel,
+            .sentence-card,
+            .date-header,
+            .completion-screen,
+            .error-screen {
+                background: rgba(255, 255, 255, 0.85);
+            }
+        }
+
         /* 스크롤바 스타일링 */
         ::-webkit-scrollbar {
             width: 8px;
@@ -922,12 +1019,12 @@
     <div class="container">
         <!-- 에러 화면 -->
         <div id="error-screen" class="error-screen">
-            <div class="error-title">⚠️ 파일 로드 오류</div>
+            <div class="error-title"><span class="emoji">⚠️</span> 파일 로드 오류</div>
             <div class="error-message">
                 <strong>sentences.js</strong> 파일을 찾을 수 없습니다!
             </div>
             <div class="error-details">
-                <h3>📋 해결 방법:</h3>
+                <h3><span class="emoji">📋</span> 해결 방법:</h3>
                 <ul>
                     <li>sentences.js 파일이 HTML 파일과 같은 폴더에 있는지 확인하세요</li>
                     <li>파일 이름이 정확히 "sentences.js"인지 확인하세요</li>
@@ -955,12 +1052,12 @@
         <!-- 컨트롤 패널 (드롭다운) -->
         <div class="control-panel-wrapper">
             <div class="control-panel" id="control-panel">
-                <div class="control-title">🎮 학습 관리</div>
+                <div class="control-title"><span class="emoji">🎮</span> 학습 관리</div>
                 <div class="control-buttons">
-                    <button class="control-btn reset-btn" onclick="resetAllProgress()">🗑️ 전체 초기화</button>
-                    <button class="control-btn info-btn" onclick="showDetailedProgress()">📊 카테고리별 진도</button>
-                    <button class="control-btn info-btn" onclick="exportProgress()">💾 진도 백업</button>
-                    <button class="control-btn info-btn" onclick="importProgress()">📂 진도 불러오기</button>
+                    <button class="control-btn reset-btn" onclick="resetAllProgress()"><span class="emoji">🗑️</span> 전체 초기화</button>
+                    <button class="control-btn info-btn" onclick="showDetailedProgress()"><span class="emoji">📊</span> 카테고리별 진도</button>
+                    <button class="control-btn info-btn" onclick="exportProgress()"><span class="emoji">💾</span> 진도 백업</button>
+                    <button class="control-btn info-btn" onclick="importProgress()"><span class="emoji">📂</span> 진도 불러오기</button>
                 </div>
                 <!-- 숨겨진 파일 입력 -->
                 <input type="file" id="progress-file-input" accept=".json" style="display: none;" onchange="handleProgressFile(this)">
@@ -971,7 +1068,7 @@
         <div id="main-screen">
             <div class="title-section">
                 <h1 class="main-title">ZENITH ENGLISH</h1>
-                <p class="subtitle">🌟 매일매일 새로운 영어 표현을 배워보세요! 🌟</p>
+                <p class="subtitle"><span class="emoji">🌟</span> 매일매일 새로운 영어 표현을 배워보세요! <span class="emoji">🌟</span></p>
             </div>
             
             <div class="categories-grid" id="categories-grid">
@@ -993,16 +1090,16 @@
                 <div class="action-buttons" id="action-buttons"></div>
             </div>
             
-            <p class="hint-text">🎤 큰 소리로 영어 문장을 읽어보세요!</p>
+            <p class="hint-text"><span class="emoji">🎤</span> 큰 소리로 영어 문장을 읽어보세요!</p>
         </div>
 
         <!-- 완료 화면 -->
         <div id="completion-screen" class="completion-screen" style="display: none;">
-            <div class="completion-title">🎉 축하합니다! 🎉</div>
+            <div class="completion-title"><span class="emoji">🎉</span> 축하합니다! <span class="emoji">🎉</span></div>
             <div class="completion-message">모든 영어 문장을 마스터했어요!</div>
             <div class="action-buttons">
-                <button class="secondary-btn" onclick="startReviewMode()">📚 복습 모드</button>
-                <button class="primary-btn" onclick="resetAllProgress()">🔄 처음부터 다시</button>
+                <button class="secondary-btn" onclick="startReviewMode()"><span class="emoji">📚</span> 복습 모드</button>
+                <button class="primary-btn" onclick="resetAllProgress()"><span class="emoji">🔄</span> 처음부터 다시</button>
             </div>
         </div>
     </div>
@@ -1152,7 +1249,7 @@
                     weekday: 'long'
                 };
                 const dateString = today.toLocaleDateString('ko-KR', options);
-                document.getElementById('today-date').textContent = `📅 ${dateString}`;
+                document.getElementById('today-date').innerHTML = `<span class="emoji">📅</span> ${dateString}`;
             }
 
             // 카테고리 카드 생성
@@ -1175,11 +1272,11 @@
                     const title = category.split(' ').slice(1).join(' ');
                     
                     card.innerHTML = `
-                        <span class="category-icon">${icon}</span>
+                        <span class="category-icon" aria-label="${title}">${icon}</span>
                         <h3 class="category-title">${title}</h3>
                         <p class="category-description">${categoryDescriptions[category]}</p>
                         <div class="category-progress">
-                            📈 진도: ${completedSentences}/${totalSentences} (${progressPercentage}%)
+                            <span class="emoji">📈</span> 진도: ${completedSentences}/${totalSentences} (${progressPercentage}%)
                         </div>
                     `;
                     
@@ -1241,7 +1338,7 @@
                 
                 const icon = currentCategory.split(' ')[0];
                 const title = currentCategory.split(' ').slice(1).join(' ');
-                document.getElementById('current-category').textContent = `${icon} ${title}`;
+                document.getElementById('current-category').innerHTML = `<span class="emoji">${icon}</span> ${title}`;
             }
 
             // 메인 화면 표시
@@ -1319,7 +1416,7 @@
                 
                 if (!isAnswerVisible) {
                     buttonsContainer.innerHTML = `
-                        <button class="primary-btn" onclick="showAnswer()">💡 예시 확인</button>
+                        <button class="primary-btn" onclick="showAnswer()"><span class="emoji">💡</span> 예시 확인</button>
                     `;
                 } else {
                     const isLastSentence = currentSentenceIndex >= sentencesData[currentCategory].length - 1;
@@ -1328,7 +1425,7 @@
                         (isLastSentence ? '카테고리 완료!' : '다음 문장');
                     
                     buttonsContainer.innerHTML = `
-                        <button class="secondary-btn" onclick="loadCurrentSentence()">🔄 다시 보기</button>
+                        <button class="secondary-btn" onclick="loadCurrentSentence()"><span class="emoji">🔄</span> 다시 보기</button>
                         <button class="primary-btn" onclick="nextSentence()">${nextButtonText}</button>
                     `;
                 }
