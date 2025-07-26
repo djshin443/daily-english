@@ -898,7 +898,7 @@
 				min-height: 60px;
 				/* pointer-events: none; 이 줄을 제거! */
 			}
-		
+
 			.nav-bar > * {
 				pointer-events: auto; /* 자식 요소들은 이벤트 허용 */
 			}
@@ -1243,6 +1243,26 @@
 </head>
 <body>
     <div class="container">
+	<button id="back-btn" style="
+        display: none;
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 9999;
+        padding: 0.8rem 1.2rem;
+        font-size: 1rem;
+        background: linear-gradient(135deg, #ff6b6b, #ff8787);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        font-weight: 600;
+        font-family: 'Noto Sans KR', sans-serif;
+        cursor: pointer;
+        touch-action: manipulation;
+        min-height: 44px;
+        min-width: 120px;
+    ">← 처음으로</button>
         <!-- 에러 화면 -->
         <div id="error-screen" class="error-screen">
             <div class="error-title"><span class="emoji">⚠️</span> 파일 로드 오류</div>
@@ -1392,16 +1412,23 @@
 
         // 메인 화면 표시
         function showMainScreen() {
-            console.log('showMainScreen 함수 호출됨');
-            document.getElementById('main-screen').style.display = 'block';
-            document.getElementById('learning-screen').style.display = 'none';
-            document.getElementById('completion-screen').style.display = 'none';
-            
-            // iOS 배경 강제 재설정
-            forceBackgroundFix();
-            
-            createCategoryCards();
-        }
+			console.log('showMainScreen 함수 호출됨');
+			document.getElementById('main-screen').style.display = 'block';
+			document.getElementById('learning-screen').style.display = 'none';
+			document.getElementById('completion-screen').style.display = 'none';
+			
+			// 고정 버튼 숨기기 - 이 부분이 누락되었음!
+			const backBtn = document.getElementById('back-btn');
+			if (backBtn) {
+				backBtn.style.display = 'none';
+			}
+			
+			// iOS 배경 강제 재설정
+			forceBackgroundFix();
+			
+			createCategoryCards();
+		}
+
         
         // window 객체에 명시적으로 할당
         window.showMainScreen = showMainScreen;
@@ -1745,52 +1772,22 @@
 			document.getElementById('learning-screen').style.display = 'block';
 			document.getElementById('completion-screen').style.display = 'none';
 			
+			// 고정 버튼 표시
+			const backBtn = document.getElementById('back-btn');
+			if (backBtn) {
+				backBtn.style.display = 'block';
+			}
+			
 			const icon = currentCategory.split(' ')[0];
 			const title = currentCategory.split(' ').slice(1).join(' ');
 			
-			// 네비게이션 바 생성
+			// nav-bar에서 버튼 제거, 제목만 표시
 			const navBar = document.getElementById('nav-bar');
 			navBar.innerHTML = `
-				<button class="back-btn" id="back-to-main">← 처음으로</button>
-				<h2 class="current-category"><span class="emoji">${icon}</span> ${title}</h2>
+				<h2 class="current-category" style="width: 100%; text-align: center; margin-left: 140px;">
+					<span class="emoji">${icon}</span> ${title}
+				</h2>
 			`;
-			
-			// JavaScript로 이벤트 리스너 직접 추가 (모바일 호환성 향상)
-			const backButton = document.getElementById('back-to-main');
-			if (backButton) {
-				// 기존 이벤트 리스너 제거
-				backButton.removeEventListener('click', showMainScreen);
-				backButton.removeEventListener('touchend', showMainScreen);
-				
-				// 클릭 이벤트 추가
-				backButton.addEventListener('click', function(e) {
-					e.preventDefault();
-					e.stopPropagation();
-					console.log('back button clicked');
-					showMainScreen();
-				});
-				
-				// 터치 이벤트 추가 (모바일 전용)
-				backButton.addEventListener('touchend', function(e) {
-					e.preventDefault();
-					e.stopPropagation();
-					console.log('back button touched');
-					showMainScreen();
-				});
-				
-				// 모바일 터치 피드백
-				backButton.addEventListener('touchstart', function(e) {
-					this.style.transform = 'scale(0.95)';
-					this.style.opacity = '0.8';
-				}, { passive: true });
-				
-				backButton.addEventListener('touchend', function(e) {
-					setTimeout(() => {
-						this.style.transform = '';
-						this.style.opacity = '';
-					}, 150);
-				}, { passive: true });
-			}
 			
 			// 화면 전환 후 이모지 수정 재적용
 			setTimeout(fixIOSEmoji, 100);
@@ -1798,13 +1795,19 @@
 
         // 완료 화면 표시
         function showCompletionScreen() {
-            document.getElementById('main-screen').style.display = 'none';
-            document.getElementById('learning-screen').style.display = 'none';
-            document.getElementById('completion-screen').style.display = 'block';
-            
-            // 완료 화면 표시 후 이모지 수정 재적용
-            setTimeout(fixIOSEmoji, 100);
-        }
+			document.getElementById('main-screen').style.display = 'none';
+			document.getElementById('learning-screen').style.display = 'none';
+			document.getElementById('completion-screen').style.display = 'block';
+			
+			// 고정 버튼 숨기기 - 이 부분 추가!
+			const backBtn = document.getElementById('back-btn');
+			if (backBtn) {
+				backBtn.style.display = 'none';
+			}
+			
+			// 완료 화면 표시 후 이모지 수정 재적용
+			setTimeout(fixIOSEmoji, 100);
+		}
 
         // 현재 문장 로드
         function loadCurrentSentence() {
@@ -2066,17 +2069,35 @@
 
         // 페이지 로드 시 스크립트 로드 시작
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('페이지 로드 완료');
-            
-            // 배경 즉시 강제 설정
-            forceBackgroundFix();
-            
-            // 이모지 수정 함수 먼저 실행
-            setTimeout(fixIOSEmoji, 100);
-            
-            // 기존 스크립트 로드
-            loadSentencesScript();
-        });
+    console.log('페이지 로드 완료');
+    
+    // 배경 즉시 강제 설정
+    forceBackgroundFix();
+    
+    // 이모지 수정 함수 먼저 실행
+    setTimeout(fixIOSEmoji, 100);
+    
+    // 기존 스크립트 로드
+    loadSentencesScript();
+    
+    // 여기에 백 버튼 이벤트 리스너 추가!
+    const backBtn = document.getElementById('back-btn');
+		if (backBtn) {
+			backBtn.addEventListener('click', function() {
+				console.log('처음으로 버튼 클릭됨');
+				showMainScreen();
+			});
+			
+			// 터치 피드백
+			backBtn.addEventListener('touchstart', function() {
+				this.style.transform = 'scale(0.95)';
+			}, { passive: true });
+			
+			backBtn.addEventListener('touchend', function() {
+				this.style.transform = 'scale(1)';
+			}, { passive: true });
+		}
+	});
 
         // 페이지 완전 로드 후에도 한 번 더 적용
         window.addEventListener('load', function() {
