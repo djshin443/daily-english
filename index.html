@@ -2,12 +2,13 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#667eea">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
     <title>오늘의 영어말하기</title>
     <link href="https://fonts.googleapis.com/css2?family=Jua:wght@400&family=Noto+Sans+KR:wght@300;400;500;600;700&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
     <style>
@@ -23,12 +24,46 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* 버튼과 상호작용 요소는 터치 허용 */
+        /* 모바일 터치 최적화 강화 */
         button, .category-card, .blank-space {
             -webkit-touch-callout: default !important;
             -webkit-user-select: none !important;
             user-select: none !important;
             pointer-events: auto !important;
+            touch-action: manipulation !important;
+            -webkit-tap-highlight-color: rgba(0,0,0,0.1) !important;
+            cursor: pointer !important;
+        }
+        
+        /* 모든 상호작용 요소에 대한 터치 최적화 */
+        .category-card, .primary-btn, .secondary-btn, .back-btn, 
+        .control-btn, .menu-toggle-btn, .blank-space, .answer-item {
+            /* 터치 영역 최소 크기 보장 */
+            min-height: 44px;
+            min-width: 44px;
+            
+            /* 터치 반응성 최적화 */
+            touch-action: manipulation;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            
+            /* 터치 하이라이트 커스터마이징 */
+            -webkit-tap-highlight-color: rgba(255,255,255,0.2);
+            
+            /* 포인터 커서 */
+            cursor: pointer;
+            
+            /* 터치 시 즉시 반응하도록 */
+            transition: transform 0.1s ease, opacity 0.1s ease, background-color 0.1s ease;
+        }
+        
+        /* 터치 활성 상태 스타일 */
+        .category-card:active, .primary-btn:active, .secondary-btn:active, 
+        .back-btn:active, .control-btn:active, .menu-toggle-btn:active,
+        .blank-space:active, .answer-item:active {
+            transform: scale(0.98) !important;
+            opacity: 0.8 !important;
         }
 
         :root {
@@ -92,6 +127,13 @@
             color: var(--text-primary);
             overflow-x: hidden;
             position: relative;
+            
+            /* 더블탭 확대 방지 강화 */
+            touch-action: manipulation !important;
+            -webkit-touch-callout: none !important;
+            -webkit-user-select: none !important;
+            user-select: none !important;
+            -ms-touch-action: manipulation !important;
             
             /* iOS 전용 설정 추가 */
             -webkit-background-size: cover !important;
@@ -846,8 +888,108 @@
             }
         }
 
-        /* 작은 화면 반응형 (모바일) */
-        @media (max-width: 480px) {
+        /* 가로모드 최적화 (모든 화면 크기) */
+        @media (orientation: landscape) and (max-height: 600px) {
+            /* 가로모드에서 터치 영역 확대 */
+            .category-card {
+                padding: 1.2rem 1rem !important;
+                min-height: 120px;
+                transition: transform 0.2s ease !important;
+            }
+            
+            .category-card:active {
+                transform: scale(0.98) !important;
+                background: rgba(255, 255, 255, 0.25) !important;
+            }
+            
+            /* 버튼 크기 확대 */
+            .primary-btn, .secondary-btn {
+                padding: 1rem 2rem !important;
+                min-height: 52px !important;
+                min-width: 140px !important;
+                font-size: 1rem !important;
+            }
+            
+            .back-btn {
+                padding: 1rem 1.5rem !important;
+                min-height: 52px !important;
+                min-width: 140px !important;
+                font-size: 1rem !important;
+            }
+            
+            /* 메뉴 버튼 확대 */
+            .menu-toggle-btn {
+                width: 3.5rem !important;
+                height: 3.5rem !important;
+                border-radius: 1.2rem !important;
+            }
+            
+            /* 빈 칸 터치 영역 확대 */
+            .blank-space {
+                padding: 1rem 2rem !important;
+                min-width: 140px !important;
+                min-height: 48px !important;
+                margin: 0.5rem !important;
+            }
+            
+            /* 답안 아이템 크기 확대 */
+            .answer-item {
+                padding: 0.75rem 1.25rem !important;
+                min-height: 44px !important;
+                font-size: 1rem !important;
+            }
+            
+            /* 가로모드에서 애니메이션 단순화 (성능 최적화) */
+            .category-card::before {
+                animation: none !important;
+            }
+            
+            body::before {
+                animation: none !important;
+            }
+            
+            .sentence-card::before {
+                animation: none !important;
+            }
+            
+            /* 가로모드 레이아웃 최적화 */
+            .container {
+                padding: 0.5rem 1rem !important;
+            }
+            
+            .sentence-card {
+                padding: 1.5rem !important;
+                margin: 1rem auto !important;
+            }
+            
+            .categories-grid {
+                gap: 0.8rem !important;
+                grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)) !important;
+            }
+            
+            /* 햄버거 메뉴 위치 조정 */
+            .menu-toggle-btn {
+                top: 0.5rem !important;
+                right: 0.5rem !important;
+            }
+            
+            .control-panel-wrapper {
+                top: 4rem !important;
+                right: 0.5rem !important;
+            }
+            
+            /* z-index 최적화 */
+            .nav-bar {
+                z-index: 50 !important;
+            }
+            
+            .category-card {
+                z-index: 1 !important;
+            }
+        }
+
+        /* 작은 화면 반응형 (모바일 세로모드) */
+        @media (max-width: 480px) and (orientation: portrait) {
             .container {
                 padding: 0.75rem;
             }
@@ -889,24 +1031,22 @@
                 max-width: 280px;
             }
 
-            
-			.nav-bar {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				margin-bottom: 1.5rem;
-				padding: 0.5rem;
-				gap: 1rem;
-				flex-wrap: wrap;
-				position: relative;
-				z-index: 10;
-				min-height: 60px;
-				/* pointer-events: none; 이 줄을 제거! */
-			}
+            .nav-bar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1.5rem;
+                padding: 0.5rem;
+                gap: 1rem;
+                flex-wrap: wrap;
+                position: relative;
+                z-index: 10;
+                min-height: 60px;
+            }
 
-			.nav-bar > * {
-				pointer-events: auto; /* 자식 요소들은 이벤트 허용 */
-			}
+            .nav-bar > * {
+                pointer-events: auto;
+            }
 
             .back-btn {
                 order: 1;
@@ -919,6 +1059,57 @@
                 order: 2;
                 width: 100%;
                 margin-bottom: 0.5rem;
+            }
+        }
+
+        /* 작은 화면 가로모드 특화 */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .action-buttons {
+                flex-direction: row !important;
+                gap: 1rem !important;
+                justify-content: center !important;
+            }
+            
+            .primary-btn, .secondary-btn {
+                width: auto !important;
+                max-width: none !important;
+                flex: 1 !important;
+                max-width: 200px !important;
+            }
+            
+            .nav-bar {
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
+                align-items: center !important;
+                margin-bottom: 1rem !important;
+            }
+            
+            .back-btn {
+                order: 1 !important;
+                width: auto !important;
+                margin-bottom: 0 !important;
+                position: fixed !important;
+                bottom: 1rem !important;
+                right: 1rem !important;
+                top: auto !important;
+                left: auto !important;
+            }
+            
+            .current-category {
+                order: 2 !important;
+                width: 100% !important;
+                text-align: center !important;
+                margin-bottom: 0 !important;
+            }
+            
+            /* 가로모드에서 문장 카드 높이 최적화 */
+            .sentence-display {
+                font-size: clamp(1.2rem, 4vw, 2.5rem) !important;
+                line-height: 1.4 !important;
+            }
+            
+            .hint-text {
+                margin-top: 1rem !important;
             }
         }
 
@@ -1751,8 +1942,12 @@
                 grid.appendChild(card);
             });
             
-            // 카드 생성 후 이모지 수정 재적용
-            setTimeout(fixIOSEmoji, 100);
+            // 카드 생성 후 이모지 수정 및 터치 최적화 재적용
+            setTimeout(() => {
+                fixIOSEmoji();
+                enhanceMobileTouch();
+                addMobileEventListeners();
+            }, 100);
         }
 
         // 카테고리 시작
@@ -1875,8 +2070,12 @@
                 `;
             }
             
-            // 버튼 업데이트 후 이모지 수정 재적용
-            setTimeout(fixIOSEmoji, 50);
+            // 버튼 업데이트 후 이모지 수정 및 터치 최적화 재적용
+            setTimeout(() => {
+                fixIOSEmoji();
+                enhanceMobileTouch();
+                addMobileEventListeners();
+            }, 50);
         }
 
         // 진도 데이터 검증
@@ -2066,17 +2265,118 @@
             }
         });
 
+        // 가로모드 감지 및 최적화
+        function optimizeForOrientation() {
+            const isLandscape = window.innerHeight < window.innerWidth;
+            const isSmallScreen = window.innerHeight < 600;
+            
+            if (isLandscape && isSmallScreen) {
+                console.log('가로모드 최적화 적용');
+                document.body.classList.add('landscape-mode');
+                
+                // 가로모드에서 터치 영역 확대
+                const style = document.createElement('style');
+                style.id = 'landscape-optimization';
+                style.textContent = `
+                    .landscape-mode .category-card {
+                        touch-action: manipulation !important;
+                        -webkit-touch-callout: none !important;
+                        -webkit-user-select: none !important;
+                        user-select: none !important;
+                    }
+                    
+                    .landscape-mode button {
+                        touch-action: manipulation !important;
+                        -webkit-tap-highlight-color: rgba(0,0,0,0.1) !important;
+                    }
+                    
+                    .landscape-mode .blank-space {
+                        touch-action: manipulation !important;
+                        cursor: pointer !important;
+                    }
+                `;
+                
+                // 기존 스타일 제거 후 새로 추가
+                const existingStyle = document.getElementById('landscape-optimization');
+                if (existingStyle) {
+                    existingStyle.remove();
+                }
+                document.head.appendChild(style);
+                
+            } else {
+                document.body.classList.remove('landscape-mode');
+                const landscapeStyle = document.getElementById('landscape-optimization');
+                if (landscapeStyle) {
+                    landscapeStyle.remove();
+                }
+            }
+        }
+
         // 모바일 터치 이벤트 처리를 위한 함수
         function addMobileEventListeners() {
-            // 모든 버튼에 대한 터치 피드백만 추가
-            const allButtons = document.querySelectorAll('button');
-            allButtons.forEach(button => {
-                button.addEventListener('touchstart', function() {
+            // 모든 버튼에 대한 향상된 터치 피드백
+            const allButtons = document.querySelectorAll('button, .category-card, .blank-space');
+            allButtons.forEach(element => {
+                // 터치 시작
+                element.addEventListener('touchstart', function(e) {
                     this.style.opacity = '0.8';
+                    this.style.transform = 'scale(0.98)';
+                    
+                    // 가로모드에서 터치 피드백 강화
+                    if (document.body.classList.contains('landscape-mode')) {
+                        this.style.backgroundColor = 'rgba(255,255,255,0.3)';
+                        this.style.transition = 'all 0.1s ease';
+                    }
                 }, { passive: true });
-                button.addEventListener('touchend', function() {
+                
+                // 터치 종료
+                element.addEventListener('touchend', function(e) {
+                    setTimeout(() => {
+                        this.style.opacity = '1';
+                        this.style.transform = 'scale(1)';
+                        if (document.body.classList.contains('landscape-mode')) {
+                            this.style.backgroundColor = '';
+                            this.style.transition = '';
+                        }
+                    }, 100);
+                }, { passive: true });
+                
+                // 터치 취소 (화면 밖으로 드래그 등)
+                element.addEventListener('touchcancel', function(e) {
                     this.style.opacity = '1';
+                    this.style.transform = 'scale(1)';
+                    if (document.body.classList.contains('landscape-mode')) {
+                        this.style.backgroundColor = '';
+                        this.style.transition = '';
+                    }
                 }, { passive: true });
+            });
+        }
+
+        // 향상된 터치 이벤트 처리
+        function enhanceMobileTouch() {
+            // 빈칸 터치 개선
+            const blankSpaces = document.querySelectorAll('.blank-space');
+            blankSpaces.forEach(blank => {
+                if (!blank.hasAttribute('data-touch-enhanced')) {
+                    blank.setAttribute('data-touch-enhanced', 'true');
+                    blank.style.cursor = 'pointer';
+                    blank.style.touchAction = 'manipulation';
+                    
+                    // 클릭 이벤트 추가 (혹시 빈칸 클릭으로 답 보기 기능을 원한다면)
+                    blank.addEventListener('click', function() {
+                        if (!isAnswerVisible) {
+                            showAnswer();
+                        }
+                    });
+                }
+            });
+            
+            // 카테고리 카드 터치 개선
+            const categoryCards = document.querySelectorAll('.category-card');
+            categoryCards.forEach(card => {
+                card.style.touchAction = 'manipulation';
+                card.style.cursor = 'pointer';
             });
         }
 
@@ -2090,10 +2390,13 @@
     // 이모지 수정 함수 먼저 실행
     setTimeout(fixIOSEmoji, 100);
     
+    // 가로모드 최적화 초기 적용
+    optimizeForOrientation();
+    
     // 기존 스크립트 로드
     loadSentencesScript();
     
-    // 여기에 백 버튼 이벤트 리스너 추가!
+    // 백 버튼 이벤트 리스너
     const backBtn = document.getElementById('back-btn');
 		if (backBtn) {
 			backBtn.addEventListener('click', function() {
@@ -2101,16 +2404,53 @@
 				showMainScreen();
 			});
 			
-			// 터치 피드백
+			// 터치 피드백 강화
 			backBtn.addEventListener('touchstart', function() {
 				this.style.transform = 'scale(0.95)';
+				this.style.opacity = '0.8';
 			}, { passive: true });
 			
 			backBtn.addEventListener('touchend', function() {
-				this.style.transform = 'scale(1)';
+				setTimeout(() => {
+					this.style.transform = 'scale(1)';
+					this.style.opacity = '1';
+				}, 100);
 			}, { passive: true });
 		}
+		
+		// 모바일 터치 이벤트 리스너 추가
+		setTimeout(() => {
+			addMobileEventListeners();
+			enhanceMobileTouch();
+		}, 500);
 	});
+
+        // 화면 회전 감지 및 최적화 재적용
+        window.addEventListener('orientationchange', function() {
+            console.log('화면 회전 감지됨');
+            
+            // 짧은 지연 후 최적화 재적용 (브라우저 렌더링 완료 대기)
+            setTimeout(() => {
+                optimizeForOrientation();
+                forceBackgroundFix();
+                fixIOSEmoji();
+                
+                // 터치 이벤트 재적용
+                setTimeout(() => {
+                    addMobileEventListeners();
+                    enhanceMobileTouch();
+                }, 200);
+            }, 300);
+        });
+
+        // 윈도우 리사이즈 시에도 최적화 적용
+        window.addEventListener('resize', function() {
+            clearTimeout(window.resizeTimeout);
+            window.resizeTimeout = setTimeout(() => {
+                optimizeForOrientation();
+                enhanceMobileTouch();
+            }, 250);
+        });
 
         // 페이지 완전 로드 후에도 한 번 더 적용
         window.addEventListener('load', function() {
@@ -2120,6 +2460,13 @@
             setTimeout(() => {
                 forceBackgroundFix();
                 fixIOSEmoji();
+                optimizeForOrientation();
+                
+                // 최종 터치 최적화 적용
+                setTimeout(() => {
+                    addMobileEventListeners();
+                    enhanceMobileTouch();
+                }, 300);
             }, 200);
         });
     </script>
