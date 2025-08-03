@@ -703,6 +703,12 @@
             box-shadow: 0 8px 25px rgba(253, 203, 110, 0.4);
             border: 2px solid rgba(255,255,255,0.3);
             vertical-align: middle;
+            cursor: pointer;
+        }
+
+        .blank-space:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(253, 203, 110, 0.6);
         }
 
         .blank-space.revealed {
@@ -799,6 +805,18 @@
 			font-weight: 600 !important;
 			transition: all 0.3s ease;
 			box-shadow: 0 4px 15px rgba(149, 117, 205, 0.3) !important;
+			cursor: pointer;
+		}
+
+		.answer-item:hover {
+			background: rgba(183, 157, 219, 0.8) !important;
+			color: #ffffff !important;
+			transform: translateY(-2px) scale(1.02);
+			box-shadow: 0 6px 20px rgba(149, 117, 205, 0.5) !important;
+		}
+
+		.answer-item:active {
+			transform: translateY(0) scale(0.98);
 		}
 
         .answer-item.current {
@@ -1773,6 +1791,8 @@
             if (blankSpace) {
                 blankSpace.textContent = currentAnswer;
                 blankSpace.classList.add('revealed');
+                // 더블클릭으로 편집 가능하게 만들기
+                makeBlankEditable(blankSpace);
             }
             
             const answerSection = document.getElementById('answer-section');
@@ -1786,7 +1806,7 @@
                 
                 allAnswers.forEach((answer, index) => {
                     const isCurrentAnswer = answer === currentAnswer;
-                    answersHtml += `<span class="answer-item ${isCurrentAnswer ? 'current' : ''}">${answer}</span>`;
+                    answersHtml += `<span class="answer-item ${isCurrentAnswer ? 'current' : ''}" onclick="selectAnswer('${answer.replace(/'/g, "\\'")}')">${answer}</span>`;
                 });
                 
                 answersHtml += '</div></div>';
@@ -1850,6 +1870,115 @@
             }
         }
 
+        // 예시 선택 (클릭 시)
+        function selectAnswer(selectedAnswer) {
+            const blankSpace = document.getElementById('blank-space');
+            if (blankSpace) {
+                blankSpace.textContent = selectedAnswer;
+                currentAnswer = selectedAnswer;
+                updateAnswerHighlight(selectedAnswer);
+                makeBlankEditable(blankSpace);
+            }
+        }
+
+        // 빈 칸을 편집 가능하게 만들기
+        function makeBlankEditable(blankSpace) {
+            // 더블클릭 이벤트 추가
+            blankSpace.addEventListener('dblclick', function() {
+                const currentText = this.textContent;
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = currentText;
+                input.className = 'blank-space-input';
+                input.style.cssText = `
+                    background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+                    color: #2d3436;
+                    padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 2rem);
+                    border-radius: 1.25rem;
+                    min-width: clamp(120px, 20vw, 180px);
+                    margin: 0.25rem 0.5rem;
+                    font-weight: 700;
+                    border: 2px solid rgba(255,255,255,0.3);
+                    vertical-align: middle;
+                    font-size: inherit;
+                    font-family: inherit;
+                    text-align: center;
+                    outline: none;
+                    box-shadow: 0 8px 25px rgba(253, 203, 110, 0.4);
+                `;
+                
+                // 기존 요소를 input으로 교체
+                this.parentNode.replaceChild(input, this);
+                input.focus();
+                input.select();
+                
+                // 엔터키나 포커스 아웃 시 저장
+                function saveEdit() {
+                    const newValue = input.value.trim();
+                    const newBlankSpace = document.createElement('span');
+                    newBlankSpace.className = 'blank-space revealed';
+                    newBlankSpace.id = 'blank-space';
+                    newBlankSpace.textContent = newValue || currentText;
+                    
+                    input.parentNode.replaceChild(newBlankSpace, input);
+                    
+                    // 새로운 값으로 업데이트
+                    currentAnswer = newValue || currentText;
+                    
+                    // 매칭 확인 및 강조 표시 업데이트
+                    checkAnswerMatch(newValue || currentText);
+                    
+                    // 다시 편집 가능하게 만들기
+                    makeBlankEditable(newBlankSpace);
+                }
+                
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        saveEdit();
+                    }
+                });
+                
+                input.addEventListener('blur', saveEdit);
+            });
+        }
+
+        // 답안 매칭 확인 및 강조 표시 업데이트
+        function checkAnswerMatch(userInput) {
+            const sentence = sentencesData[currentCategory][currentSentenceIndex];
+            const allAnswers = sentence.answers;
+            
+            // 모든 예시의 강조 표시 제거
+            const answerItems = document.querySelectorAll('.answer-item');
+            answerItems.forEach(item => {
+                item.classList.remove('current');
+            });
+            
+            // 100% 일치하는 예시가 있는지 확인
+            const matchedAnswer = allAnswers.find(answer => 
+                answer.toLowerCase().trim() === userInput.toLowerCase().trim()
+            );
+            
+            if (matchedAnswer) {
+                // 일치하는 예시에 보라색 강조 표시
+                answerItems.forEach(item => {
+                    if (item.textContent.toLowerCase().trim() === matchedAnswer.toLowerCase().trim()) {
+                        item.classList.add('current');
+                    }
+                });
+            }
+        }
+
+        // 답안 강조 표시 업데이트
+        function updateAnswerHighlight(selectedAnswer) {
+            const answerItems = document.querySelectorAll('.answer-item');
+            answerItems.forEach(item => {
+                item.classList.remove('current');
+                if (item.textContent === selectedAnswer) {
+                    item.classList.add('current');
+                }
+            });
+        }
+
         // =============== 전역 함수들 끝 ===============
         
         // window 객체에 모든 전역 함수 명시적으로 할당
@@ -1865,6 +1994,10 @@
         window.showAnswer = showAnswer;
         window.hideAnswer = hideAnswer;
         window.nextSentence = nextSentence;
+        window.selectAnswer = selectAnswer;
+        window.makeBlankEditable = makeBlankEditable;
+        window.checkAnswerMatch = checkAnswerMatch;
+        window.updateAnswerHighlight = updateAnswerHighlight;
 
         // =============== 내부 함수들 시작 ===============
 
@@ -2047,6 +2180,14 @@
             
             display.innerHTML = sentenceHtml;
             document.getElementById('answer-section').innerHTML = '';
+            
+            // 빈 칸에 더블클릭 이벤트 추가 (예시 확인 전에도)
+            setTimeout(() => {
+                const blankSpace = document.getElementById('blank-space');
+                if (blankSpace) {
+                    makeBlankEditable(blankSpace);
+                }
+            }, 100);
         }
 
         // 액션 버튼 업데이트
@@ -2363,12 +2504,41 @@
                     blank.style.cursor = 'pointer';
                     blank.style.touchAction = 'manipulation';
                     
-                    // 클릭 이벤트 추가 (혹시 빈칸 클릭으로 답 보기 기능을 원한다면)
-                    blank.addEventListener('click', function() {
-                        if (!isAnswerVisible) {
-                            showAnswer();
-                        }
-                    });
+                    // 터치 피드백 추가
+                    blank.addEventListener('touchstart', function() {
+                        this.style.transform = 'scale(0.98)';
+                        this.style.opacity = '0.8';
+                    }, { passive: true });
+                    
+                    blank.addEventListener('touchend', function() {
+                        setTimeout(() => {
+                            this.style.transform = 'scale(1)';
+                            this.style.opacity = '1';
+                        }, 100);
+                    }, { passive: true });
+                }
+            });
+            
+            // 예시 아이템 터치 개선
+            const answerItems = document.querySelectorAll('.answer-item');
+            answerItems.forEach(item => {
+                if (!item.hasAttribute('data-touch-enhanced')) {
+                    item.setAttribute('data-touch-enhanced', 'true');
+                    item.style.cursor = 'pointer';
+                    item.style.touchAction = 'manipulation';
+                    
+                    // 터치 피드백 추가
+                    item.addEventListener('touchstart', function() {
+                        this.style.transform = 'scale(0.95)';
+                        this.style.opacity = '0.8';
+                    }, { passive: true });
+                    
+                    item.addEventListener('touchend', function() {
+                        setTimeout(() => {
+                            this.style.transform = 'scale(1)';
+                            this.style.opacity = '1';
+                        }, 100);
+                    }, { passive: true });
                 }
             });
             
