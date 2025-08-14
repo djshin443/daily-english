@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" style="background: #667eea;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -12,6 +12,12 @@
     <title>오늘의 영어말하기</title>
     <link href="https://fonts.googleapis.com/css2?family=Jua:wght@400&family=Noto+Sans+KR:wght@300;400;500;600;700&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
     <style>
+        /* iOS 깜빡임 방지 - 맨 처음에 추가 */
+        html {
+            background: #667eea;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -118,7 +124,7 @@
 
         body {
             font-family: 'Jua', 'Noto Sans KR', 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
-            /* iOS 배경 문제 해결 - 최강 강제 설정 */
+            /* iOS 배경 문제 해결 - 추가된 부분 */
             background-color: #667eea !important;
             background-image: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
@@ -127,6 +133,14 @@
             color: var(--text-primary);
             overflow-x: hidden;
             position: relative;
+            
+            /* iOS 렌더링 최적화 추가 */
+            -webkit-backface-visibility: hidden;
+            -moz-backface-visibility: hidden;
+            backface-visibility: hidden;
+            -webkit-transform: translate3d(0, 0, 0);
+            -moz-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
             
             /* 더블탭 확대 방지 강화 */
             touch-action: manipulation !important;
@@ -153,6 +167,9 @@
             background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.05"><circle cx="30" cy="30" r="4"/></g></svg>') repeat;
             pointer-events: none;
             z-index: -1;
+            /* iOS 렌더링 최적화 추가 */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
         }
 
         @media (min-width: 769px) {
@@ -495,6 +512,11 @@
             animation: slideInUp 0.8s ease-out;
             touch-action: manipulation;
             will-change: transform;
+            /* iOS 렌더링 최적화 추가 */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
         }
 
         .category-card:hover {
@@ -657,6 +679,11 @@
             text-align: center;
             position: relative;
             overflow: hidden;
+            /* iOS 렌더링 최적화 추가 */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
         }
 
         .sentence-card::before {
@@ -852,6 +879,11 @@
             animation: bounceIn 1s ease-out;
             max-width: 600px;
             margin: 2rem auto;
+            /* iOS 렌더링 최적화 추가 */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
         }
 
         .completion-title {
@@ -1456,8 +1488,10 @@
     </style>
 </head>
 <body>
+    <!-- 모든 JavaScript는 그대로 유지 -->
     <div class="container">
-	<button id="back-btn" style="
+        <!-- HTML 구조는 기존과 동일 -->
+        <button id="back-btn" style="
         display: none;
         position: fixed;
         top: 1rem;
@@ -1477,6 +1511,7 @@
         min-height: 44px;
         min-width: 120px;
     ">← 처음으로</button>
+        
         <!-- 에러 화면 -->
         <div id="error-screen" class="error-screen">
             <div class="error-title"><span class="emoji">⚠️</span> 파일 로드 오류</div>
